@@ -12,20 +12,29 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+   
+   /usr/bin/mongod --quiet --config /etc/mongod.conf
+    * use KTrack
+db.createUser( { user: "admin",
+                 pwd: "crypt*2461",
+                 customData: { },
+                 roles: [ { role: "clusterAdmin", db: "admin" },
+                          { role: "readAnyDatabase", db: "admin" },
+                          "readWrite"] })
+                          
+                          sudo /usr/bin/mongo localhost:27017/KTrack --quiet populatedb.js
  */
 package ktrack.repository;
 
-import java.util.List;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.stereotype.Repository;
 
 import ktrack.entity.User;
 
-@RepositoryRestResource(collectionResourceRel = "users", path = "users")
+@Repository
 public interface UserRepository extends MongoRepository<User, String> {
 
-	List<User> findByPasswordHash(@Param("passwordHash") String passwordHash);
+	User findByName(@Param("name") String name);
 
 }

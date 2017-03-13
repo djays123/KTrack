@@ -21,42 +21,34 @@ public class User {
 
 		@Id private String id;
 
-		private String login;
-		private String passwordHash;
+		private String name;
+		private String password;
 		
-		private String firstName;
-		private String lastName;
+		private String role;
+		
 
-		public String getFirstName() {
-			return firstName;
+		public String getRole() {
+			return role;
 		}
 
-		public void setFirstName(String firstName) {
-			this.firstName = firstName;
-		}
-
-		public String getLastName() {
-			return lastName;
-		}
-
-		public void setLastName(String lastName) {
-			this.lastName = lastName;
+		public void setRole(String role) {
+			this.role = role;
 		}
 		
-		public String getLogin() {
-			return login;
+		public String getName() {
+			return name;
 		}
 
-		public void setLogin(String login) {
-			this.login = login;
+		public void setName(String name) {
+			this.name = name;
 		}
 
-		public String getPasswordHash() {
-			return passwordHash;
+		public String getPassword() {
+			return password;
 		}
 
-		public void setPasswordHash(String passwordHash) {
-			this.passwordHash = passwordHash;
+		public void setPassword(String password) {
+			this.password = password;
 		}
 
 	
