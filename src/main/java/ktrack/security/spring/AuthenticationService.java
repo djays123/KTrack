@@ -2,6 +2,7 @@ package ktrack.security.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,11 +30,11 @@ public class AuthenticationService implements UserDetailsService {
 		User user = userRepository.findByName(username);
 		if (user == null) {
 			throw new UsernameNotFoundException(username);
-		} else {
-			Collection<GrantedAuthority> authorities = new ArrayList<>();
+		} else {			
 			String[] roles = user.getRole().split(",");
+			Collection<GrantedAuthority> authorities = new ArrayList<>(roles.length);
 			for (String role : roles) {
-				authorities.add(new SimpleGrantedAuthority(role));
+				authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
 			}
 			UserDetails details = new org.springframework.security.core.userdetails.User(user.getName(),
 					user.getPassword(), authorities);

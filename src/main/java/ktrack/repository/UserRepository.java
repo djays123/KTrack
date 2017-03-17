@@ -23,8 +23,11 @@ db.createUser( { user: "admin",
                           "readWrite"] })
                           
                           sudo /usr/bin/mongo localhost:27017/KTrack --quiet populatedb.js
+                          mongo localhost:27017/KTrack  D:/Installables/eclipseworkspace/ktrack/src/main/resources/populatedb.js
  */
 package ktrack.repository;
+
+import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;

@@ -1,8 +1,74 @@
 <html xmlns:wicket="http://wicket.apache.org">
-    <head></head>
-    <body>
-    <wicket:extend>
-       Welcome to KTrack!
-       </wicket:extend>
-    </body>
+<head></head>
+<body>
+	<wicket:extend>
+		<div class="jumbotron">
+			<div class="container">
+				<div class="row row-eq-height">
+
+					<div class="col-md-6">
+						<form class="" name="save-dog-form">
+							<div class="form-group">
+								<div class="col-md-12 input-group">
+									<span class="input-group-addon"><i
+										class="glyphicon glyphicon-globe"></i></span> <input type="text"
+										class="input-md form-control" id="location" name="username"
+										wicket:message="placeholder:location" required />
+								</div>
+							</div>
+							<div class="form-group img-upload">
+							<div class="col-md-12 input-group">
+								<button type="button" class="btn btn-default btn-file">
+									<span>Browse</span>
+								</button>
+								<input type="file" name="file-input"
+									wicket:message="placeholder:picture" required />
+
+
+								<button type="button" class="btn btn-default">Remove</button>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="first_name"
+										name="first_name" placeholder="First Name" />
+								</div>
+								<div class="col-md-4">
+									<input type="text" class="form-control" id="last_name"
+										name="last_name" placeholder="Last Name" />
+								</div>
+								<div class="col-md-4 input-group">
+									<span class="input-group-addon">@</span> <input type="email"
+										class="form-control" id="email" name="email"
+										placeholder="Email Address" />
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-12 ">
+									<textarea rows="6" class="form-control" id="comments"
+										name="comments" placeholder="Your question or comment here"></textarea>
+								</div>
+							</div>
+							<div class="row form-group">
+								<div class="col-md-6">
+									<button type="submit" value="Submit"
+										class="btn btn-warning pull-right">Send</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-md-6">
+						<div
+							class="embed-responsive embed-responsive-4by3 panel panel-default">
+							<div id="map-container" class="embed-responsive-item panel-body"></div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!-- /row -->
+		</div>
+	</wicket:extend>
+</body>
 </html>
