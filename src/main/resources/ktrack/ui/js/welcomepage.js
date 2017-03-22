@@ -19,5 +19,14 @@ $(function() {
 		}
 	});
 
-	$('.img-upload').imgupload();
+	var myDropzone = new Dropzone('div#images',{		
+		url : '/',
+		paramName : 'images[]',
+		addRemoveLinks : true,
+		acceptedFiles : 'image/*',
+		dictDefaultMessage: 'Drop or click to upload pictures',	
+		clickable: '#images',
+		autoProcessQueue: false,
+		uploadMultiple: true
+	});
 });

@@ -3,6 +3,7 @@ package ktrack;
 import org.apache.wicket.request.resource.caching.FilenameWithVersionResourceCachingStrategy;
 import org.apache.wicket.request.resource.caching.NoOpResourceCachingStrategy;
 import org.apache.wicket.request.resource.caching.version.CachingResourceVersion;
+import org.apache.wicket.resource.NoOpTextCompressor;
 import org.apache.wicket.serialize.java.DeflatedJavaSerializer;
 import org.apache.wicket.settings.RequestCycleSettings;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,7 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		settings.setJsResourceFilterName("footer-container").setThemeProvider(themeProvider)
 				.setActiveThemeProvider(new CookieThemeProvider());
 
-		BootstrapLess.install(this);
+		BootstrapLess.install(this);		
 	}
 
 	/**
@@ -56,9 +57,9 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		if (usesDeploymentConfig()) {
 			getResourceSettings().setCachingStrategy(new FilenameWithVersionResourceCachingStrategy("-v-",
 					new CachingResourceVersion(new Adler32ResourceVersion())));
-
-			getResourceSettings().setJavaScriptCompressor(
-					new GoogleClosureJavaScriptCompressor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
+			getResourceSettings().setJavaScriptCompressor(new NoOpTextCompressor());
+			//getResourceSettings().setJavaScriptCompressor(
+			//		new GoogleClosureJavaScriptCompressor(CompilationLevel.SIMPLE_OPTIMIZATIONS));
 			getResourceSettings().setCssCompressor(new YuiCssCompressor());
 
 			getFrameworkSettings().setSerializer(new DeflatedJavaSerializer(getApplicationKey()));
