@@ -25,8 +25,9 @@ $(function() {
 		addRemoveLinks : true,
 		acceptedFiles : 'image/*',
 		dictDefaultMessage: 'Drop or click to upload pictures',	
-		clickable: '#images',
 		autoProcessQueue: false,
-		uploadMultiple: true
+		uploadMultiple: true,
+		maxFiles: 3
 	});
+	
 });

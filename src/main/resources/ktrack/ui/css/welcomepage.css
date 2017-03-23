@@ -2,9 +2,21 @@
  * Row with equal height columns
  * --------------------------------------------------
  */
-.row-eq-height {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display:         flex;
+
+.add-check .active:before {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\e013";
 }
+
+.dropzone {
+    overflow: 'auto';
+    height: '200px';
+}   

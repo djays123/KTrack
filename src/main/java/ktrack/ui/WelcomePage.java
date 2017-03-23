@@ -33,27 +33,46 @@ public class WelcomePage extends BaseAuthenticatedPage {
 		super(pageParams);
 		add(new Icon("paw-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.paw).build()));
 		add(new Icon("location-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.location_arrow).build()));
+		add(new Icon("comment-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.comment).build()));
 		BooleanRadioGroup sex = new BooleanRadioGroup("sex", new Model<Boolean>(Boolean.FALSE));
 		sex.setChoiceRenderer(new BooleanRadioChoiceRenderer(Type.Primary, this) {
+			@Override
 			protected String resourceKey(Boolean choice) {
 				return choice ?  "male" : "female";
 			}
+			
+			@Override
+		    public String getButtonClass(Boolean option) {
+		        return Type.Primary.cssClassName() + " btn-sm";
+		    }
 		});
 		add(sex);
 		
 		BooleanRadioGroup sterlized = new BooleanRadioGroup("sterilized", new Model<Boolean>(Boolean.FALSE));
 		sterlized.setChoiceRenderer(new BooleanRadioChoiceRenderer(Type.Primary, this) {
+			@Override
 			protected String resourceKey(Boolean choice) {
 				return choice ?  "sterilized" : "not-sterilized";
 			}
+			
+			@Override
+		    public String getButtonClass(Boolean option) {
+		        return Type.Primary.cssClassName() + " btn-sm";
+		    }
 		});
 		add(sterlized);
 		
 		BooleanRadioGroup behavior = new BooleanRadioGroup("behavior", new Model<Boolean>(Boolean.FALSE));
 		behavior.setChoiceRenderer(new BooleanRadioChoiceRenderer(Type.Primary, this) {
+			@Override
 			protected String resourceKey(Boolean choice) {
 				return choice ?  "friendly" : "not-friendly";
 			}
+			
+			@Override
+		    public String getButtonClass(Boolean option) {
+		        return Type.Primary.cssClassName() + " btn-sm";
+		    }
 		});
 		add(behavior);
 

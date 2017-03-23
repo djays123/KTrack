@@ -4,11 +4,12 @@
 	<wicket:extend>
 		<div class="jumbotron">
 			<div class="container">
-				<div class="row row-eq-height">
+				<div class="row">
+					<form id="save-dog-form" name="save-dog-form"
+						enctype="multipart/form-data" method="POST" class="">
+						<div class="row">
+						<div class="col-md-6">
 
-					<div class="col-md-8">
-						<form id="save-dog-form" name="save-dog-form"
-							enctype="multipart/form-data" method="POST" class="">
 							<div class="form-group">
 								<div class="col-md-12 input-group">
 									<span class="input-group-addon"><i class="glyphicon"
@@ -17,49 +18,59 @@
 										wicket:message="placeholder:name" />
 								</div>
 							</div>
-							<div class="form-group ">
-								
-									<span wicket:id="sex"></span>
-									<span wicket:id="sterilized" class=""></span>
-									<span wicket:id="behavior" class=""></span>
-											
+							
+							<div class="form-group">
+								<div id="images" class="dropzone"  ></div>
+							</div>
+                            <div class="form-group">
+                                <div class="col-md-12 input-group">
+                                    <span class="input-group-addon"><i class="glyphicon"
+                                        wicket:id="comment-fa"></i></span>
+                                    <textarea rows="12" class="form-control" id="comments"
+                                        name="comments" wicket:message="placeholder:comments"></textarea>
+                                </div>
+                            </div>
+							
+							
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<span wicket:id="sex" class="add-check"></span> <span
+									wicket:id="sterilized" class="add-check"></span> <span
+									wicket:id="behavior" class="add-check"></span>
 							</div>
 							<div class="form-group">
-								<div class="col-md-12 input-group">
+								<div class=" input-group">
 									<span class="input-group-addon"><i class="glyphicon"
 										wicket:id="location-fa"></i></span> <input type="text"
 										class="input-md form-control" id="location" name="username"
 										wicket:message="placeholder:location" required />
 								</div>
 							</div>
-							<div class="form-group">
-								<div id="image-files" class=""></div>
-								<div id="images" class="dropzone"></div>
+
+							<div
+								class="embed-responsive embed-responsive-4by3 panel panel-default">
+								<div id="map-container" class="embed-responsive-item panel-body"></div>
 							</div>
 
-							<div class="form-group">
-								<div class="col-md-12 ">
-									<textarea rows="6" class="form-control" id="comments"
-										name="comments" placeholder="Your question or comment here"></textarea>
-								</div>
-							</div>
-							<div class="row form-group">
-								<div class="col-md-6">
-									<button type="submit" value="Submit"
-										class="btn btn-warning pull-right">Send</button>
-								</div>
-							</div>
-						</form>
-					</div>
-					<div class="col-md-6">
-						<div
-							class="embed-responsive embed-responsive-4by3 panel panel-default">
-							<div id="map-container" class="embed-responsive-item panel-body"></div>
 						</div>
-
-					</div>
+						</div>
+						<div class="row">
+						<div class="form-group">
+                                <div class="col-md-6 input-group">
+                                    <button type="submit" value="Submit"
+                                        class="btn btn-primary pull-right">
+                                        <wicket:message key="save">Hello</wicket:message>
+                                    </button>
+                                </div>
+                            </div>
+						
+						</div>
+					</form>
 				</div>
+
 			</div>
+
 			<!-- /row -->
 		</div>
 	</wicket:extend>
