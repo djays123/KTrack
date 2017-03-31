@@ -17,6 +17,11 @@
 }
 
 .dropzone {
-    overflow: 'auto';
-    height: '200px';
+    overflow: auto;
+    height: 100%;
+    width: 95%;
+    position:absolute;
+    z-index:10;
+    border:0px;
+    background:none;
 }   
