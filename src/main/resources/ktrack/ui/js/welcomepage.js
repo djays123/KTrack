@@ -10,8 +10,8 @@ $(function() {
 		addressFormat : 'sublocality_level_2',
 		inputBinding : {
 			locationNameInput : $('#location'),
-			latitudeInput : $('#latitudeInput'),
-			longitudeInput : $('#longitudeInput')
+			latitudeInput : $('#latitude'),
+			longitudeInput : $('#longitude')
 
 		},
 		autocompleteOptions : {
@@ -46,8 +46,20 @@ $(function() {
         }, 0);
 		
 	};
+	
+	var filePreviewKey = "";
 	pictureDropzone.on("addedfile", function(file) {
 		updateImageShim();
+		file.previewElement.addEventListener("click", function() {
+		    if(file.fileKey) {		  
+		    	if(file.fileKey !== filePreviewKey) {
+		    		$('#image-file-key').val(file.fileKey);
+		    		$('#image-preview-form').trigger('submit');
+		    	}
+		    	$('#image-preview').modal({keyboard:true, show:true});	
+		    	filePreviewKey = file.fileKey;
+		    }
+		});
 	 });
 	
 	pictureDropzone.on("removedfile", function(file) {
@@ -69,7 +81,8 @@ $(function() {
 			    name: fileKeyId,
 			    value : fileKey
 			}).appendTo('#save-dog-form');
-			files[index].fileKey = fileKeyId;
+			files[index].fileKey = fileKeyId;		
+			
 		});
 	});
 	

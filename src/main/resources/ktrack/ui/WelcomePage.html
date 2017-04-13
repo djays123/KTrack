@@ -4,7 +4,8 @@
 	<wicket:extend>
 		<div class="jumbotron">
 			<div class="container">
-				<div class="row">
+				<div class="row">					
+					<div wicket:id="feedback"></div>
 					<form id="save-dog-form" name="save-dog-form"
 						method="POST" wicket:id="save-dog-form">
 						<div class="row">
@@ -55,8 +56,8 @@
 										wicket:id="location-fa"></i></span> <input type="text"
 										class="input-md form-control" id="location" name="username"
 										wicket:message="placeholder:location" required />
-										<input type="hidden" id="latitudeInput" name="latitudeInput"/>
-										<input type="hidden" id="longitudeInput" name="longitudeInput"/>
+										<input type="hidden" id="latitude" name="latitude"/>
+										<input type="hidden" id="longitude" name="longitude"/>
 								</div>
 							</div>
 
@@ -87,7 +88,7 @@
 		
 		<form id="upload-file-form" wicket:id="upload-file-form" class="hidden">		
 		</form>
-		
+		<div wicket:id="image-preview" id="image-preview"></div>
 	</wicket:extend>
 </body>
 </html>

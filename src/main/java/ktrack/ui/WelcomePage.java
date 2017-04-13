@@ -1,27 +1,33 @@
 package ktrack.ui;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.MimetypesFileTypeMap;
-
+import org.apache.commons.lang3.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
+import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.protocol.http.IMultipartWebRequest;
 import org.apache.wicket.request.IRequestCycle;
 import org.apache.wicket.request.IRequestHandler;
+import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
@@ -44,14 +50,26 @@ import ktrack.entity.Dog;
 import ktrack.entity.Sex;
 import ktrack.entity.Sterilized;
 import ktrack.repository.DogNamesRepository;
+import ktrack.repository.DogRepository;
 
 @MountPath("/welcome")
 public class WelcomePage extends BaseAuthenticatedPage {
+	
+	/** The initial latitude. */
+	private static final Double LATITUDE = 18.52895184;
+	
+	/** The initial longitude. */
+	private static final Double LONGITUDE = 73.87434160;
+	
 	/** The google maps API key. */
 	private static String GOOGLE_MAPS_KEY = "AIzaSyCCBGibN4Tkk59VRZ2AtFnJdqTPK6PymNQ";
 
 	@SpringBean
 	private DogNamesRepository dogNamesRepository;
+	
+	@SpringBean
+	private DogRepository dogRepository;
+
 
 	/**
 	 * 
@@ -61,15 +79,51 @@ public class WelcomePage extends BaseAuthenticatedPage {
 		super(pageParams);
 
 		Dog dog = new Dog();
-
+		dog.setLatitude(LATITUDE);
+		dog.setLongitude(LONGITUDE);
 		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
 		Form<Dog> form = new Form<Dog>("save-dog-form", dogModel);
-		// form.setMultiPart(true);
+		TextField<String> dogName = new TextField<String>("name");
+		dogName.setOutputMarkupId(true);
+		FeedbackPanel feedback = new FeedbackPanel("feedback") {
+			  @Override
+			    protected String getCSSClass(FeedbackMessage message) {
+			        switch (message.getLevel()){
+			            case FeedbackMessage.SUCCESS:
+			               return "active list-unstyled";			           
+			        }
+
+			        return super.getCSSClass(message);
+			    }
+		};
+		feedback.setOutputMarkupId(true);
+		
 		AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-				DogNamesRepository dg = dogNamesRepository;
-				System.out.println("Dog Name:" + dg.getRandomName(Sex.M));
+				if(StringUtils.isEmpty(dog.getName())) {
+					dog.setName(dogNamesRepository.getRandomName(dog.getSex()).getName());
+					target.add(dogName);
+				}
+				
+				List<String> imageIds = new LinkedList();
+				IRequestParameters postParams = getRequest().getPostParameters();
+				postParams.getParameterNames().forEach(param -> {
+					if(StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)){
+						imageIds.add(StringUtils.substringAfter(param, ImagePreview.IMAGE_FILE_ID_PREFIX));
+					}
+				});
+			
+				dog.getImageIds().forEach(imageId -> {
+					if(! imageIds.contains(imageId)) {
+						dogNamesRepository.removeImage(imageId);
+					}
+				});
+				dog.setImageIds(imageIds);
+				dogRepository.save(dog);
+				success(getString("save-success"));
+				feedback.add(new AttributeModifier("class", "add-check alert alert-success"));
+				target.add(feedback);
 			}
 
 			@Override
@@ -79,11 +133,17 @@ public class WelcomePage extends BaseAuthenticatedPage {
 			}
 		};
 
-		form.add(new TextField<String>("name"));
+		form.add(dogName);
 		form.add(new TextArea<String>("comments"));
+		form.add(new HiddenField<Double>("latitude", Double.class));
+		form.add(new HiddenField<Double>("longitude", Double.class));
 		form.add(ajaxFormSubmitBehavior);
 		add(form);
-
+		add(feedback);
+	
+		ImagePreview<Void> imagePreview = new ImagePreview<>("image-preview");
+		imagePreview.header(Model.<String>of(getString("view-image")));
+		add(imagePreview);
 		Form uploadFileform = new Form<Void>("upload-file-form") {
 
 			@Override
@@ -97,13 +157,16 @@ public class WelcomePage extends BaseAuthenticatedPage {
 				for (org.apache.commons.fileupload.FileItem uploadedFile : fileUploads) {
 					String fileName = uploadedFile.getName();
 					try {
-						fileKeys.add(dogNamesRepository.saveImage(uploadedFile.getInputStream(), fileName,
-								new MimetypesFileTypeMap().getContentType(fileName)));
+						String fileId = dogNamesRepository.saveImage(uploadedFile.getInputStream(), fileName,
+								 URLConnection.guessContentTypeFromName(fileName));
+						fileKeys.add(fileId);		
+						dog.getImageIds().add(fileId);
 					} catch (IOException ioException) {
 						throw new IllegalArgumentException("Failed to create uploaded file: " + uploadedFile.getName());
 					}
 				}
 
+				
 				getRequestCycle().scheduleRequestHandlerAfterCurrent(new IRequestHandler() {
 					@Override
 					public void detach(IRequestCycle reqCycle) {

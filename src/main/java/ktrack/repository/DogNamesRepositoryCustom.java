@@ -38,5 +38,19 @@ public interface DogNamesRepositoryCustom {
 	 * @return The id of the saved image.
 	 */
 	String saveImage(InputStream inputStream, String fileName, String contentType);
+	
+	/**
+	 * Removes the image file specified by the id.
+	 * @param imageFileId The image file id.
+	 */
+	public void removeImage(String imageFileId);
+	
+	/**
+	 * Returns the image as bytes from the image file specified by the id.
+	 * @param imageFileId The image file id.
+	 * 
+	 * @return The image data as bytes. Null if an error occurs or if the file corresponding to the id does not exist.
+	 */
+	public byte[] getImage(String imageFileId);
 
 }

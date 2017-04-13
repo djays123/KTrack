@@ -18,16 +18,21 @@ package ktrack.repository;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.gridfs.GridFSDBFile;
 
 import ktrack.db.SampleOperation;
 import ktrack.entity.DogName;
@@ -55,6 +60,25 @@ public class DogNamesRepositoryImpl implements DogNamesRepositoryCustom {
 		DBObject metaData = new BasicDBObject();
 		return this.gridFsTemplate.store(inputStream, fileName, contentType, metaData).getId().toString();
 
+	}
+
+	public void removeImage(String imageFileId) {
+		gridFsTemplate.delete(new Query(Criteria.where("_id").is(imageFileId)));
+	}
+
+	public byte[] getImage(String imageFileId) {
+		try {
+			GridFSDBFile imageFile = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(imageFileId)));
+			if (imageFile != null) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				imageFile.writeTo(baos);
+				return baos.toByteArray();
+			}
+		} catch (IOException exception) {
+			//TODO: Log error!
+		}
+
+		return null;
 	}
 
 }
