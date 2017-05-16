@@ -50,6 +50,37 @@ public class Dog implements Serializable {
 
 	private Double longitude;
 	
+	private String userId;
+	
+	private Integer age;
+	
+	private String location;
+	
+	
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 	public String getId() {
         return id;
     }

@@ -6,7 +6,7 @@ import org.apache.wicket.request.resource.caching.version.CachingResourceVersion
 import org.apache.wicket.resource.NoOpTextCompressor;
 import org.apache.wicket.serialize.java.DeflatedJavaSerializer;
 import org.apache.wicket.settings.RequestCycleSettings;
-import org.apache.wicket.util.file.Folder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.giffing.wicket.spring.boot.starter.app.WicketBootSecuredWebApplication;
@@ -25,8 +25,7 @@ import de.agilecoders.wicket.themes.markup.html.bootswatch.BootswatchThemeProvid
 
 @Component
 public class WebApp extends WicketBootSecuredWebApplication {
-	// Uploaded folder for temp file.
-	private Folder uploadFolder = null;
+
 
 	@Override
 	protected void init() {
@@ -35,17 +34,11 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		configureBootstrap();
 		optimizeForWebPerformance();
 
-		uploadFolder = new Folder(System.getProperty("java.io.tmpdir"), "ktrack-file-uploads");
-		// Ensure folder exists
-		uploadFolder.mkdirs();
-
 		getDebugSettings().setAjaxDebugModeEnabled(true);
 
 	}
 
-	public Folder getUploadFolder() {
-		return uploadFolder;
-	}
+
 
 	/**
 	 * configures wicket-bootstrap and installs the settings.
@@ -81,6 +74,10 @@ public class WebApp extends WicketBootSecuredWebApplication {
 
 		setHeaderResponseDecorator(new RenderJavaScriptToFooterHeaderResponseDecorator());
 		getRequestCycleSettings().setRenderStrategy(RequestCycleSettings.RenderStrategy.ONE_PASS_RENDER);
+	}
+	
+	public String getLoggedInUsername() {
+		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 
 }

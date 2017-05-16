@@ -19,6 +19,8 @@ import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.HiddenField;
+import org.apache.wicket.markup.html.form.NumberTextField;
+import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -45,6 +47,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.image.Icon;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder.FontAwesomeGraphic;
+import ktrack.WebApp;
 import ktrack.entity.Behavior;
 import ktrack.entity.Dog;
 import ktrack.entity.Sex;
@@ -120,6 +123,7 @@ public class WelcomePage extends BaseAuthenticatedPage {
 					}
 				});
 				dog.setImageIds(imageIds);
+				dog.setUserId(((WebApp)getApplication()).getLoggedInUsername());
 				dogRepository.save(dog);
 				success(getString("save-success"));
 				feedback.add(new AttributeModifier("class", "add-check alert alert-success"));
@@ -135,8 +139,10 @@ public class WelcomePage extends BaseAuthenticatedPage {
 
 		form.add(dogName);
 		form.add(new TextArea<String>("comments"));
+		form.add(new RequiredTextField<String>("location"));
 		form.add(new HiddenField<Double>("latitude", Double.class));
 		form.add(new HiddenField<Double>("longitude", Double.class));
+		form.add(new NumberTextField<Integer>("age", Integer.class).setMinimum(0).setMaximum(15).setStep(1));
 		form.add(ajaxFormSubmitBehavior);
 		add(form);
 		add(feedback);
@@ -162,7 +168,7 @@ public class WelcomePage extends BaseAuthenticatedPage {
 						fileKeys.add(fileId);		
 						dog.getImageIds().add(fileId);
 					} catch (IOException ioException) {
-						throw new IllegalArgumentException("Failed to create uploaded file: " + uploadedFile.getName());
+						throw new IllegalArgumentException("Failed to create uploaded file: " + fileName);
 					}
 				}
 
@@ -193,6 +199,7 @@ public class WelcomePage extends BaseAuthenticatedPage {
 		form.add(new Icon("location-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.location_arrow).build()));
 		form.add(new Icon("comment-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.comment).build()));
 		form.add(new Icon("photo-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.camera).build()));
+		form.add(new Icon("age-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar_check_o).build()));
 
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));

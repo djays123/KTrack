@@ -23,10 +23,6 @@ public class AuthenticationService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		/*
-		 * Here add user data layer fetching from the MongoDB. I have used
-		 * userRepository
-		 */
 		User user = userRepository.findByName(username);
 		if (user == null) {
 			throw new UsernameNotFoundException(username);
