@@ -2,12 +2,22 @@
 <head></head>
 <body>
 	<wicket:extend>
-		<div wicket:id="pageable">
-			<div class="item" wicket:id="item"></div>
+		<div wicket:id="dogsDataContainer" class="container">
+			<table class="table">
+				<tbody>
+					<tr class="item" wicket:id="dogsData">
+					   <td wicket:id="id"></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="clearfix"></div>
+            <ul id="pager" wicket:id="pager"></ul>
+			
+
 		</div>
 
-		<div class="clearfix"></div>
-		<div id="pager" wicket:id="pager"></div>
+
+
 	</wicket:extend>
 </body>
 </html>
