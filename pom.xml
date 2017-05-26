@@ -41,6 +41,13 @@
 			<artifactId>wicketstuff-annotation </artifactId>
 			<version>7.6.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.wicketstuff/wicketstuff-datatables -->
+		<dependency>
+			<groupId>org.wicketstuff</groupId>
+			<artifactId>wicketstuff-datatables</artifactId>
+			<version>8.0.0-M3</version>
+		</dependency>
+
 		<dependency>
 			<groupId>de.agilecoders.wicket</groupId>
 			<artifactId>wicket-bootstrap-core</artifactId>
@@ -72,7 +79,7 @@
 			<artifactId>yuicompressor</artifactId>
 			<version>2.4.8</version>
 		</dependency>
-		
+
 	</dependencies>
 	<build>
 		<plugins>

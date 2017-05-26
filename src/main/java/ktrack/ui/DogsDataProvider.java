@@ -2,7 +2,7 @@ package ktrack.ui;
 
 import java.util.Iterator;
 
-import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import ktrack.entity.Dog;
 import ktrack.repository.DogRepository;
 
-public class DogsDataProvider implements IDataProvider<Dog> {
+public class DogsDataProvider extends SortableDataProvider<Dog, String> {
+
 
 	private DogRepository dogRepository;
 
@@ -43,5 +44,6 @@ public class DogsDataProvider implements IDataProvider<Dog> {
 	public IModel<Dog> model(Dog object) {	
 		return Model.<Dog>of(object);
 	}
+
 
 }
