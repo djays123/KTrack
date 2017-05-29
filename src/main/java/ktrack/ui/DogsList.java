@@ -12,8 +12,10 @@ import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import org.wicketstuff.datatables.DataTables;
 import org.wicketstuff.datatables.columns.SpanColumn;
@@ -35,13 +37,6 @@ import ktrack.repository.DogRepository;
 @MountPath("/dogs")
 public class DogsList extends BaseAuthenticatedPage {
 
-	/** The maximum number of records displayed per page. */
-	private int MAX_RECORDS_PER_PAGE = 2;
-
-	/** The dog properties shown in the grid. */
-	private static final String[] DOG_PROPERTIES = { "name", "age", "sex", "sterilized", "behavior", "location",
-			"comments" };
-
 	@SpringBean
 	private DogRepository dogRepository;
 
@@ -52,44 +47,40 @@ public class DogsList extends BaseAuthenticatedPage {
 	 */
 	public DogsList(PageParameters pageParams) {
 		super(pageParams);
-		List<IColumn<Dog, ? extends Object>> columns = new ArrayList<>(DOG_PROPERTIES.length);
+		List<IColumn<Dog, ? extends Object>> columns = new ArrayList<>(DogsDataProvider.DOG_PROPERTIES.length);
 		List<Column> datatableColumns = new ArrayList<>();
 
-		for (String dogProperty : DOG_PROPERTIES) {
+		for (String dogProperty : DogsDataProvider.DOG_PROPERTIES) {
 			StringResourceModel displayModel = new StringResourceModel(dogProperty, this, null);
 			columns.add(new SpanColumn<Dog, String>(displayModel, dogProperty));
 			datatableColumns.add(new Column(dogProperty));
 		}
 
-		DogsDataProvider dogsDataProvider = new DogsDataProvider(dogRepository);
 		DataTables<Dog, String> table = new DataTables("dogTable", columns);
 		table.addTopToolbar(new SpanHeadersToolbar<>(table));
-		CharSequence ajaxUrl = urlFor(new DogDataVirtualScrollResourceReference(dogsDataProvider), null);
+		CharSequence ajaxUrl = urlFor(new DogDataVirtualScrollResourceReference(), null);
 		ScrollerOptions scrollerOptions = new ScrollerOptions();
 		scrollerOptions.loadingIndicator(true).displayBuffer(100).serverWait(500);
 
 		Options options = table.getOptions();
-		Map<String, CharSequence> ajaxOptions = new HashMap<>();
-		ajaxOptions.put("url", ajaxUrl);
-		ajaxOptions.put("type", "POST");
-		
+
 		AbstractConfig ajaxConfig = new AbstractConfig() {
 		};
 		ajaxConfig.put(new Key<>("url", null), ajaxUrl);
 		ajaxConfig.put(new Key<>("type", null), "POST");
-		
-		IKey<AbstractConfig> ajaxConfigKey = new Key<>("ajax", null);
+
+		IKey<AbstractConfig> ajaxConfigKey = new Key<>(Options.Ajax.key(), null);
 
 		options.columns(datatableColumns).serverSide(true).ordering(true).searching(true).scrollY("300")
 				.deferRender(true).scroller(scrollerOptions).dom("frti") // "p"
-																						// is
-																						// removed
-																						// because
-																						// we
-																						// use
-																						// Scroller
-																						// (virtual
-																						// scrolling)
+																			// is
+																			// removed
+																			// because
+																			// we
+																			// use
+																			// Scroller
+																			// (virtual
+																			// scrolling)
 				// .scrollCollapse(true)
 				.stateSave(true).info(true).processing(false).retrieve(true).put(ajaxConfigKey, ajaxConfig);
 
@@ -99,12 +90,8 @@ public class DogsList extends BaseAuthenticatedPage {
 
 	private class DogDataVirtualScrollResourceReference extends AbstractVirtualScrollResourceReference<Dog> {
 
-		/** The Dog data provider. */
-		private DogsDataProvider dogsDataProvider;
-
-		public DogDataVirtualScrollResourceReference(DogsDataProvider dogsDataProvider) {
+		public DogDataVirtualScrollResourceReference() {
 			super(DogDataVirtualScrollResourceReference.class, "dogsDataVitrualScrollResRef");
-			this.dogsDataProvider = dogsDataProvider;
 		}
 
 		@Override
@@ -122,20 +109,37 @@ public class DogsList extends BaseAuthenticatedPage {
 			dogPropertyValues.put(Behavior.AGGRESSIVE, getString("aggressive"));
 
 			CompoundPropertyModel<Dog> dogPropertyModel = CompoundPropertyModel.of(Model.of(dog));
-			for (String dogProperty : DOG_PROPERTIES) {
+			for (String dogProperty : DogsDataProvider.DOG_PROPERTIES) {
 				Object value = dogPropertyModel.bind(dogProperty).getObject();
 				if (value != null) {
 					value = value.getClass().isEnum() ? dogPropertyValues.get(value) : value;
 					entryJson.put(dogProperty, value);
 				} else {
 					entryJson.put(dogProperty, StringUtils.EMPTY);
-				}				
+				}
 			}
 		}
 
 		@Override
 		protected IDataProvider<Dog> getDataProvider(PageParameters parameters) {
-			return dogsDataProvider;
+			return new DogsDataProvider(dogRepository, parameters);
+		}
+
+		@Override
+		protected String generateResponse(PageParameters params) {
+			IRequestParameters parameters = getRequest().getRequestParameters();
+
+			PageParameters pageParameters = new PageParameters();
+			for (String paramName : parameters.getParameterNames()) {
+				List<StringValue> values = parameters.getParameterValues(paramName);
+				String[] valuesArray = new String[values.size()];
+				int i = 0;
+				for (StringValue val : values) {
+					valuesArray[i++] = val.toString();
+				}
+				pageParameters.add(paramName, valuesArray);
+			}
+			return super.generateResponse(pageParameters);
 		}
 
 	}

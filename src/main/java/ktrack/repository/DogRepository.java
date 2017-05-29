@@ -7,5 +7,6 @@ import ktrack.entity.Dog;
 
 @Repository
 public interface DogRepository extends MongoRepository<Dog, String> {
+	
 
 }
