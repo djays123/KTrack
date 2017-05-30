@@ -24,6 +24,10 @@ db.createUser( { user: "admin",
                           
                           sudo /usr/bin/mongo localhost:27017/KTrack --quiet populatedb.js
                           mongo localhost:27017/KTrack  D:/Installables/eclipseworkspace/ktrack/src/main/resources/populatedb.js
+                          
+                          Create index on text fields
+                          db.dogs.ensureIndex({ name: "text", location : "text", comments : "text" });
+                          
  */
 package ktrack.repository;
 

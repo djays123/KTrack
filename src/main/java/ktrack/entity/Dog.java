@@ -16,12 +16,18 @@
 package ktrack.entity;
 
 import java.io.Serializable;
+import com.querydsl.core.annotations.QueryEntity;
+
 import java.util.LinkedList;
 import java.util.List;
 
+import org.mongodb.morphia.annotations.Entity;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@QueryEntity
+@Entity
 @Document(collection = "dogs")
 public class Dog implements Serializable {
 	
@@ -34,8 +40,10 @@ public class Dog implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@TextIndexed(weight = 8)
 	private String name;
 
+	@TextIndexed(weight = 9)
 	private String comments;
 
 	private Sex sex = Sex.F;
@@ -54,6 +62,7 @@ public class Dog implements Serializable {
 	
 	private Integer age;
 	
+	@TextIndexed(weight = 10)
 	private String location;
 	
 	

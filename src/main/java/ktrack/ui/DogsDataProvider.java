@@ -9,6 +9,9 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 
 import ktrack.entity.Dog;
 import ktrack.repository.DogRepository;
@@ -18,13 +21,13 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	protected static final String[] DOG_PROPERTIES = { "name", "age", "sex", "sterilized", "behavior", "location",
 			"comments" };
 
-
 	/** The dogs repository. */
 	private DogRepository dogRepository;
-	
-	/** The page parameters - these hold information like sorting and searching. */
+
+	/**
+	 * The page parameters - these hold information like sorting and searching.
+	 */
 	private PageParameters pageParameters;
-	
 
 	/**
 	 * The constructor.
@@ -45,12 +48,27 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	@Override
 	public Iterator<? extends Dog> iterator(long first, long count) {
 		String orderColumnIndexParam = pageParameters.get("order[0][column]").toString();
-		if(StringUtils.isNotEmpty(orderColumnIndexParam)) {
-			Integer orderColumnIndex = Integer.parseInt(orderColumnIndexParam);
-			String columnData = pageParameters.get("columns[" + orderColumnIndex +"][data]").toString();
-			String columnOrderDir = pageParameters.get("order[0][dir]").toString();
-			Sort.Direction sortDirection = StringUtils.equalsIgnoreCase("asc", columnOrderDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
-			return dogRepository.findAll(new Sort(sortDirection, columnData)).iterator();
+		String serachText = pageParameters.get("search[value]").toString();
+
+		if (StringUtils.isNotEmpty(orderColumnIndexParam) || StringUtils.isNotEmpty(serachText)) {
+			Query query = new Query();
+			if (StringUtils.isNotEmpty(orderColumnIndexParam)) {
+				Integer orderColumnIndex = Integer.parseInt(orderColumnIndexParam);
+				String columnData = pageParameters.get("columns[" + orderColumnIndex + "][data]").toString();
+				String columnOrderDir = pageParameters.get("order[0][dir]").toString();
+				Sort.Direction sortDirection = StringUtils.equalsIgnoreCase("asc", columnOrderDir) ? Sort.Direction.ASC
+						: Sort.Direction.DESC;
+				PageRequest request = new PageRequest((int) first, (int) count, new Sort(sortDirection, columnData));
+				query.with(request);
+			}
+
+			if (StringUtils.isNotEmpty(serachText)) {
+				// Create TextCriteria
+				TextCriteria criteria = TextCriteria.forDefaultLanguage().caseSensitive(false).matching(serachText);
+				query.addCriteria(criteria);
+			}
+
+			return dogRepository.findBy(query).iterator();
 		}
 		return dogRepository.findAll(new PageRequest((int) first, (int) count)).iterator();
 	}
@@ -61,9 +79,8 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	}
 
 	@Override
-	public IModel<Dog> model(Dog object) {	
+	public IModel<Dog> model(Dog object) {
 		return Model.<Dog>of(object);
 	}
-
 
 }
