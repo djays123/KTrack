@@ -2,6 +2,7 @@ package ktrack.ui;
 
 import java.util.Iterator;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
@@ -9,7 +10,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 
@@ -17,9 +17,16 @@ import ktrack.entity.Dog;
 import ktrack.repository.DogRepository;
 
 public class DogsDataProvider extends SortableDataProvider<Dog, String> {
+	/** The property that shows the dog's images. */
+	protected static final String IMAGE_PROPERTY = "imageIds";
+
+	/** The orderable dog properties. */
+	protected static final String[] ORDERABLE_DOG_PROPERTIES = { "name", "age", "sex", "sterilized", "behavior",
+			"location" };
+
 	/** The dog properties shown in the grid. */
-	protected static final String[] DOG_PROPERTIES = { "name", "age", "sex", "sterilized", "behavior", "location",
-			"comments" };
+	protected static final String[] DOG_PROPERTIES = ArrayUtils.addAll(ORDERABLE_DOG_PROPERTIES,
+			new String[] { "comments", IMAGE_PROPERTY });
 
 	/** The dogs repository. */
 	private DogRepository dogRepository;
@@ -64,7 +71,7 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 
 			if (StringUtils.isNotEmpty(serachText)) {
 				// Create TextCriteria
-				TextCriteria criteria = TextCriteria.forDefaultLanguage().caseSensitive(false).matching(serachText);
+				TextCriteria criteria = TextCriteria.forDefaultLanguage().caseSensitive(false).matchingAny(serachText);
 				query.addCriteria(criteria);
 			}
 

@@ -9,6 +9,7 @@ import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.DynamicImageResource;
+import org.apache.wicket.request.resource.IResource.Attributes;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
@@ -30,17 +31,24 @@ public class ImagePreview<T> extends Modal<T> {
 
 		Image image = new Image("imgid", "preview");
 		image.setOutputMarkupId(true);
-		image.setMarkupId("imgid");
-		image.setImageResource(new DynamicImageResource() {
-			protected byte[] getImageData(Attributes attributes) {
-				String imageId = StringUtils.substringAfter(imageKey.getObject(), ImagePreview.IMAGE_FILE_ID_PREFIX);
-				if (StringUtils.isNotEmpty(imageId)) {
-					return dogNamesRepository.getImage(imageId);
-				}
-				
-				return new byte[0];
+		image.setMarkupId("imgid");	
+		DynamicImageResource snapshotImageResource = new SnapshotResource() {
+			@Override
+			protected DogNamesRepository getDogNamesRepository() {
+				return dogNamesRepository;
 			}
-		});
+			
+			protected String getImageId(Attributes attributes) {
+				return StringUtils.substringAfter(imageKey.getObject(), ImagePreview.IMAGE_FILE_ID_PREFIX);
+			}
+
+			@Override
+			protected boolean isThumbnail() {
+				return false;
+			}
+
+		};
+		image.setImageResource(snapshotImageResource);
 		add(image);
 
 		Form imagePreviewForm = new Form<Void>("image-preview-form");
@@ -51,7 +59,7 @@ public class ImagePreview<T> extends Modal<T> {
 		AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-					target.add(image);				
+				target.add(image);
 			}
 
 			@Override
@@ -63,7 +71,7 @@ public class ImagePreview<T> extends Modal<T> {
 
 		imagePreviewForm.add(ajaxFormSubmitBehavior);
 		add(imagePreviewForm);
-		
+
 		size(Size.Large);
 
 	}
