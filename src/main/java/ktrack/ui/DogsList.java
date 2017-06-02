@@ -11,9 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.json.JSONArray;
 import org.apache.wicket.ajax.json.JSONObject;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.CompoundPropertyModel;
@@ -21,6 +21,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
@@ -37,6 +38,7 @@ import org.wicketstuff.datatables.options.Options;
 import org.wicketstuff.datatables.options.ScrollerOptions;
 import org.wicketstuff.datatables.virtualscroll.AbstractVirtualScrollResourceReference;
 
+import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
 import de.agilecoders.wicket.jquery.AbstractConfig;
 import de.agilecoders.wicket.jquery.IKey;
 import de.agilecoders.wicket.jquery.Key;
@@ -68,7 +70,7 @@ public class DogsList extends BaseAuthenticatedPage {
 		List<IColumn<Dog, ? extends Object>> columns = new ArrayList<>(DogsDataProvider.DOG_PROPERTIES.length);
 
 		List<Column> datatableColumns = new ArrayList<>(DogsDataProvider.DOG_PROPERTIES.length);
-		
+
 		SnapshotResource snapshotResource = new SnapshotResource() {
 			@Override
 			protected DogNamesRepository getDogNamesRepository() {
@@ -89,12 +91,13 @@ public class DogsList extends BaseAuthenticatedPage {
 			}
 
 		}, (PageParameters) null).toString();
-		TextTemplate renderThumbNailJSCode = new PackageTextTemplate(getClass(), "js/doglist.js", "text/javascript", "UTF-8");
-		Map<String,Object> vars = new HashMap<String,Object>();
-        vars.put("SNAPSHOTURL", snapshotUrl);
-        vars.put("PREVIEWKEY", ImagePreview.IMAGE_FILE_ID_PREFIX);
-        String renderFunctionValue = renderThumbNailJSCode.asString(vars);
-        
+		TextTemplate renderThumbNailJSCode = new PackageTextTemplate(getClass(), "js/doglist.js", "text/javascript",
+				"UTF-8");
+		Map<String, Object> vars = new HashMap<String, Object>();
+		vars.put("SNAPSHOTURL", snapshotUrl);
+		vars.put("PREVIEWKEY", ImagePreview.IMAGE_FILE_ID_PREFIX);
+		String renderFunctionValue = renderThumbNailJSCode.asString(vars);
+
 		for (String dogProperty : DogsDataProvider.DOG_PROPERTIES) {
 			StringResourceModel displayModel = new StringResourceModel(dogProperty, this, null);
 			columns.add(new SpanColumn<Dog, String>(displayModel, dogProperty));
@@ -124,7 +127,7 @@ public class DogsList extends BaseAuthenticatedPage {
 		IKey<AbstractConfig> ajaxConfigKey = new Key<>(Options.Ajax.key(), null);
 
 		options.columns(datatableColumns).serverSide(true).ordering(true).searching(true).scrollY("300")
-				.deferRender(true).scroller(scrollerOptions).dom("frti") // "p"
+				.deferRender(true).scroller(scrollerOptions).dom("Bfrti") // "p"
 																			// is
 																			// removed
 																			// because
@@ -136,12 +139,49 @@ public class DogsList extends BaseAuthenticatedPage {
 				// .scrollCollapse(true)
 				.stateSave(true).info(true).processing(false).retrieve(true).put(ajaxConfigKey, ajaxConfig);
 
+		String[] buttonsArray = new String[] { "copy", "csv", "excel", "pdf", "print" };
+		options.put(new Key<String[]>("buttons", null), buttonsArray);
+
 		add(table);
 
 		ImagePreview<Void> imagePreview = new ImagePreview<>("image-preview");
 		imagePreview.header(Model.<String>of(getString("view-image")));
 		add(imagePreview);
 
+	}
+	
+	@Override
+	public void renderHead(IHeaderResponse response) {
+		super.renderHead(response);
+		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
+				new JavaScriptResourceReference(getClass(), "js/datatables/dataTables.buttons.min.js", getLocale(), getStyle(), getVariation())),
+				"footer-container"));
+		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
+				new JavaScriptResourceReference(getClass(), "js/datatables/buttons.flash.min.js", getLocale(), getStyle(), getVariation())),
+				"footer-container"));
+		
+		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
+				new JavaScriptResourceReference(getClass(), "js/datatables/jszip.min.js", getLocale(), getStyle(), getVariation())),
+				"footer-container"));
+		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
+				new JavaScriptResourceReference(getClass(), "js/datatables/pdfmake.min.js", getLocale(), getStyle(), getVariation())),
+				"footer-container"));
+		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
+				new JavaScriptResourceReference(getClass(), "js/datatables/vfs_fonts.js", getLocale(), getStyle(), getVariation())),
+				"footer-container"));
+		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
+				new JavaScriptResourceReference(getClass(), "js/datatables/buttons.html5.min.js", getLocale(), getStyle(), getVariation())),
+				"footer-container"));
+		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
+				new JavaScriptResourceReference(getClass(), "js/datatables/buttons.print.min.js", getLocale(), getStyle(), getVariation())),
+				"footer-container"));
+		
+		response.render(new FilteredHeaderItem(
+				CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/datatables/buttons.dataTables.min.css")),
+				"footer-container"));
+		
+		
+		
 	}
 
 	private class DogDataVirtualScrollResourceReference extends AbstractVirtualScrollResourceReference<Dog> {
@@ -171,7 +211,7 @@ public class DogsList extends BaseAuthenticatedPage {
 					if (value instanceof Collection) {
 						entryJson.put(dogProperty, new JSONArray((Collection<?>) value));
 					} else {
-						value = StringUtils.defaultString(dogPropertyValues.get(value) , value.toString());
+						value = StringUtils.defaultString(dogPropertyValues.get(value), value.toString());
 						entryJson.put(dogProperty, value);
 					}
 				} else {
