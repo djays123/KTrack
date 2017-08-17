@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Component;
+import org.apache.wicket.Page;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -12,6 +13,7 @@ import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.head.filter.HeaderResponseContainer;
 import org.apache.wicket.markup.html.GenericWebPage;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -60,6 +62,15 @@ public class BasePage<T> extends GenericWebPage<T> {
 	}
 
 	/**
+	 * Returns true if the user is signed in.
+	 * 
+	 * @return true is the user is signed in.
+	 */
+	protected final boolean isSignedIn() {
+		return AbstractAuthenticatedWebSession.get().isSignedIn();
+	}
+
+	/**
 	 * creates a new {@link Navbar} instance
 	 *
 	 * @param markupId
@@ -67,20 +78,11 @@ public class BasePage<T> extends GenericWebPage<T> {
 	 * @return a new {@link Navbar} instance
 	 */
 	protected Navbar newNavbar(String markupId) {
-		Navbar navbar = new Navbar(markupId);
+		Navbar navbar = new Navbar(markupId) ;
 
 		navbar.setPosition(Navbar.Position.TOP);
-
-		// show brand name
-		 navbar.setBrandName(Model.of(getString("navbar-brand")));
-		NavbarButton<HomePage> homeButton = new NavbarButton<>(HomePage.class, Model.of(getString("navbar-brand")));
-		homeButton.setVisible(false);	
-		navbar.addComponents(new ImmutableNavbarComponent(
-				homeButton,
-				Navbar.ComponentPosition.LEFT));
 		
 		addNavbarComponents(navbar);
-		
 
 		DropDownButton dropdown = new NavbarDropDownButton(Model.of(getString("themes"))) {
 			@Override
@@ -112,14 +114,14 @@ public class BasePage<T> extends GenericWebPage<T> {
 
 		return navbar;
 	}
-	
-		
+
 	/**
 	 * To be overidden to augment the navbar.
+	 * 
 	 * @param navbar
 	 */
 	protected void addNavbarComponents(final Navbar navbar) {
-		
+
 	};
 
 	/**

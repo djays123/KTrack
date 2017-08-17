@@ -10,13 +10,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @EnableWebSecurity(debug = true)
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
-	@Autowired 
-    private UserDetailsService loginService;  
+	@Autowired
+	private UserDetailsService loginService;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/").permitAll().antMatchers("/wicket/resource/**").permitAll().antMatchers("/**").hasRole("USER").and().formLogin().loginPage("/")
-				.defaultSuccessUrl("/dogs").permitAll().and().logout().logoutUrl("/logout").logoutSuccessUrl("/").and().csrf().disable();
+		http.authorizeRequests().antMatchers("/").permitAll().antMatchers("/wicket/resource/**").permitAll()
+				.antMatchers("/**").hasRole("USER").and().formLogin().loginPage("/").permitAll()
+				.defaultSuccessUrl("/dogs").and().logout().logoutUrl("/logout").logoutSuccessUrl("/")
+				.clearAuthentication(true).and().csrf().disable();
 	}
 
 	@Autowired
