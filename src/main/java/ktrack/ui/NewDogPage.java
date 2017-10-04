@@ -3,6 +3,7 @@ package ktrack.ui;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons.Type;
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BooleanRadioChoiceRenderer;
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BooleanRadioGroup;
 import de.agilecoders.wicket.core.markup.html.bootstrap.image.Icon;
+import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
+import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextFieldConfig;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder.FontAwesomeGraphic;
@@ -55,75 +58,75 @@ import ktrack.entity.Sterilized;
 import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
 
-@MountPath("/welcome")
-public class WelcomePage extends BaseAuthenticatedPage {
-	
+@MountPath("/newdog")
+public class NewDogPage extends BaseAuthenticatedPage {
+
 	/** The initial latitude. */
 	private static final Double LATITUDE = 18.52895184;
-	
+
 	/** The initial longitude. */
 	private static final Double LONGITUDE = 73.87434160;
-	
+
 	/** The google maps API key. */
 	private static String GOOGLE_MAPS_KEY = "AIzaSyCCBGibN4Tkk59VRZ2AtFnJdqTPK6PymNQ";
 
 	@SpringBean
 	private DogNamesRepository dogNamesRepository;
-	
+
 	@SpringBean
 	private DogRepository dogRepository;
-
 
 	/**
 	 * 
 	 * @param pageParams
 	 */
-	public WelcomePage(final PageParameters pageParams) {
+	public NewDogPage(final PageParameters pageParams) {
 		super(pageParams);
 
 		Dog dog = new Dog();
 		dog.setLatitude(LATITUDE);
 		dog.setLongitude(LONGITUDE);
+		dog.setArrivalDate(new Date());
 		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
 		Form<Dog> form = new Form<Dog>("save-dog-form", dogModel);
 		TextField<String> dogName = new TextField<String>("name");
 		dogName.setOutputMarkupId(true);
 		FeedbackPanel feedback = new FeedbackPanel("feedback") {
-			  @Override
-			    protected String getCSSClass(FeedbackMessage message) {
-			        switch (message.getLevel()){
-			            case FeedbackMessage.SUCCESS:
-			               return "active list-unstyled";			           
-			        }
+			@Override
+			protected String getCSSClass(FeedbackMessage message) {
+				switch (message.getLevel()) {
+				case FeedbackMessage.SUCCESS:
+					return "active list-unstyled";
+				}
 
-			        return super.getCSSClass(message);
-			    }
+				return super.getCSSClass(message);
+			}
 		};
 		feedback.setOutputMarkupId(true);
-		
+
 		AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-				if(StringUtils.isEmpty(dog.getName())) {
+				if (StringUtils.isEmpty(dog.getName())) {
 					dog.setName(dogNamesRepository.getRandomName(dog.getSex()).getName());
 					target.add(dogName);
 				}
-				
+
 				List<String> imageIds = new LinkedList();
 				IRequestParameters postParams = getRequest().getPostParameters();
 				postParams.getParameterNames().forEach(param -> {
-					if(StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)){
+					if (StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
 						imageIds.add(StringUtils.substringAfter(param, ImagePreview.IMAGE_FILE_ID_PREFIX));
 					}
 				});
-			
+
 				dog.getImageIds().forEach(imageId -> {
-					if(! imageIds.contains(imageId)) {
+					if (!imageIds.contains(imageId)) {
 						dogNamesRepository.removeImage(imageId);
 					}
 				});
 				dog.setImageIds(imageIds);
-				dog.setUserId(((WebApp)getApplication()).getLoggedInUsername());
+				dog.setUserId(((WebApp) getApplication()).getLoggedInUsername());
 				dogRepository.save(dog);
 				success(getString("save-success"));
 				feedback.add(new AttributeModifier("class", "add-check alert alert-success"));
@@ -138,15 +141,23 @@ public class WelcomePage extends BaseAuthenticatedPage {
 		};
 
 		form.add(dogName);
+		form.add(new TextField<String>("vetrinarian"));
 		form.add(new TextArea<String>("comments"));
 		form.add(new RequiredTextField<String>("location"));
 		form.add(new HiddenField<Double>("latitude", Double.class));
 		form.add(new HiddenField<Double>("longitude", Double.class));
 		form.add(new NumberTextField<Integer>("age", Integer.class).setMinimum(0).setMaximum(15).setStep(1));
+		form.add(new NumberTextField<Integer>("kennel", Integer.class).setMinimum(1).setMaximum(999).setStep(1));
+		form.add(new DateTextField("arrivalDate", new DateTextFieldConfig().autoClose(true).withFormat("dd/mm/yyyy")));
+		form.add(new DateTextField("surgeryDate", new DateTextFieldConfig().autoClose(true).withFormat("dd/mm/yyyy")));
+		form.add(new DateTextField("releaseDate", new DateTextFieldConfig().autoClose(true).withFormat("dd/mm/yyyy")));
+		form.add(new TextField<String>("caregiver"));
+		form.add(new TextField<String>("caregiverMobile"));
+		
 		form.add(ajaxFormSubmitBehavior);
 		add(form);
 		add(feedback);
-	
+
 		ImagePreview<Void> imagePreview = new ImagePreview<>("image-preview");
 		imagePreview.header(Model.<String>of(getString("view-image")));
 		add(imagePreview);
@@ -164,15 +175,14 @@ public class WelcomePage extends BaseAuthenticatedPage {
 					String fileName = uploadedFile.getName();
 					try {
 						String fileId = dogNamesRepository.saveImage(uploadedFile.getInputStream(), fileName,
-								 URLConnection.guessContentTypeFromName(fileName));
-						fileKeys.add(fileId);		
+								URLConnection.guessContentTypeFromName(fileName));
+						fileKeys.add(fileId);
 						dog.getImageIds().add(fileId);
 					} catch (IOException ioException) {
 						throw new IllegalArgumentException("Failed to create uploaded file: " + fileName);
 					}
 				}
 
-				
 				getRequestCycle().scheduleRequestHandlerAfterCurrent(new IRequestHandler() {
 					@Override
 					public void detach(IRequestCycle reqCycle) {
@@ -196,11 +206,17 @@ public class WelcomePage extends BaseAuthenticatedPage {
 		add(uploadFileform);
 
 		form.add(new Icon("paw-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.paw).build()));
+		form.add(new Icon("home-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.home).build()));
 		form.add(new Icon("location-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.location_arrow).build()));
 		form.add(new Icon("comment-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.comment).build()));
 		form.add(new Icon("photo-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.camera).build()));
 		form.add(new Icon("age-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar_check_o).build()));
-
+		form.add(new Icon("doctor-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.stethoscope).build()));
+		form.add(new Icon("arrival-calendar-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar).build()));
+		form.add(new Icon("surgery-calendar-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar).build()));
+		form.add(new Icon("release-calendar-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar).build()));
+		form.add(new Icon("caregiver-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.user).build()));
+		form.add(new Icon("caregiverMobile-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.mobile).build()));
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
 		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));
@@ -223,7 +239,7 @@ public class WelcomePage extends BaseAuthenticatedPage {
 						.forUrl("http://maps.google.com/maps/api/js?key=" + GOOGLE_MAPS_KEY + "&libraries=places"),
 				"footer-container"));
 		response.render(new FilteredHeaderItem(
-				CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/welcomepage.css")),
+				CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/NewDogPage.css")),
 				"footer-container"));
 
 		response.render(new FilteredHeaderItem(

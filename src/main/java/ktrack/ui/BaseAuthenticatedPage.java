@@ -27,7 +27,7 @@ public abstract class BaseAuthenticatedPage extends BasePage {
 		NavbarButton<HomePage> homeButton = new NavbarButton<>(DogsList.class, Model.of(getString("dogs-list")));
 		homeButton.setVisible(true);
 
-		NavbarButton<HomePage> addDogButton = new NavbarButton<>(WelcomePage.class, Model.of(getString("add-dog")));
+		NavbarButton<HomePage> addDogButton = new NavbarButton<>(NewDogPage.class, Model.of(getString("add-dog")));
 		addDogButton.setVisible(true);
 
 		navbar.addComponents(new ImmutableNavbarComponent(homeButton, Navbar.ComponentPosition.LEFT),

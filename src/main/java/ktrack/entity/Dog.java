@@ -18,6 +18,7 @@ package ktrack.entity;
 import java.io.Serializable;
 import com.querydsl.core.annotations.QueryEntity;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,10 +63,80 @@ public class Dog implements Serializable {
 	
 	private Integer age;
 	
+	private Integer kennel;
+	
 	@TextIndexed(weight = 10)
 	private String location;
 	
+	private String vetrinarian;
 	
+	private Date arrivalDate;
+	
+	private Date surgeryDate;
+	
+	private Date releaseDate;
+	
+	private String caregiver;
+	
+	private String caregiverMobile;
+	
+	
+	public String getCaregiver() {
+		return caregiver;
+	}
+
+	public void setCaregiver(String caregiver) {
+		this.caregiver = caregiver;
+	}
+
+	public String getCaregiverMobile() {
+		return caregiverMobile;
+	}
+
+	public void setCaregiverMobile(String caregiverMobile) {
+		this.caregiverMobile = caregiverMobile;
+	}
+
+	public Date getSurgeryDate() {
+		return surgeryDate;
+	}
+
+	public void setSurgeryDate(Date surgeryDate) {
+		this.surgeryDate = surgeryDate;
+	}
+
+	public Date getReleaseDate() {
+		return releaseDate;
+	}
+
+	public void setReleaseDate(Date releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public Date getArrivalDate() {
+		return arrivalDate;
+	}
+
+	public void setArrivalDate(Date arrivalDate) {
+		this.arrivalDate = arrivalDate;
+	}
+
+	public String getVetrinarian() {
+		return vetrinarian;
+	}
+
+	public void setVetrinarian(String vetrinarian) {
+		this.vetrinarian = vetrinarian;
+	}
+
+	public Integer getKennel() {
+		return kennel;
+	}
+
+	public void setKennel(Integer kennel) {
+		this.kennel = kennel;
+	}
+
 	public String getLocation() {
 		return location;
 	}

@@ -36,6 +36,8 @@ import org.wicketstuff.datatables.columns.SpanHeadersToolbar;
 import org.wicketstuff.datatables.options.Column;
 import org.wicketstuff.datatables.options.Options;
 import org.wicketstuff.datatables.options.ScrollerOptions;
+import org.wicketstuff.datatables.options.SelectOptions;
+import org.wicketstuff.datatables.options.SelectOptions.Style;
 import org.wicketstuff.datatables.virtualscroll.AbstractVirtualScrollResourceReference;
 
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
@@ -103,6 +105,7 @@ public class DogsList extends BaseAuthenticatedPage {
 			columns.add(new SpanColumn<Dog, String>(displayModel, dogProperty));
 			Column column = new Column(dogProperty,
 					ArrayUtils.contains(DogsDataProvider.ORDERABLE_DOG_PROPERTIES, dogProperty));
+		
 			if (DogsDataProvider.IMAGE_PROPERTY.equals(dogProperty)) {
 				Json.RawValue renderFunction = new Json.RawValue(renderFunctionValue);
 
@@ -123,6 +126,8 @@ public class DogsList extends BaseAuthenticatedPage {
 		};
 		ajaxConfig.put(new Key<>("url", null), ajaxUrl);
 		ajaxConfig.put(new Key<>("type", null), "POST");
+		
+		SelectOptions selectOptions = new SelectOptions().style(Style.Multi).selector("td:first-child");
 
 		IKey<AbstractConfig> ajaxConfigKey = new Key<>(Options.Ajax.key(), null);
 
@@ -137,7 +142,7 @@ public class DogsList extends BaseAuthenticatedPage {
 																			// (virtual
 																			// scrolling)
 				// .scrollCollapse(true)
-				.stateSave(true).info(true).processing(false).retrieve(true).put(ajaxConfigKey, ajaxConfig);
+				.stateSave(true).info(true).processing(false).retrieve(true).select(selectOptions).put(ajaxConfigKey, ajaxConfig);
 
 		String[] buttonsArray = new String[] { "copy", "csv", "excel", "pdf", "print" };
 		options.put(new Key<String[]>("buttons", null), buttonsArray);
