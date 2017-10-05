@@ -1,8 +1,7 @@
 <html xmlns:wicket="http://wicket.apache.org">
 <head></head>
 <body>
-	<wicket:extend>
-		<div class="jumbotron">
+	<wicket:extend>		
 			<div class="container">
 				<div class="row">
 					<div wicket:id="feedback"></div>
@@ -71,7 +70,7 @@
 										</div>
 										<div class="">
 											<div id="images" class="dropzone"></div>
-											<textarea rows="10" id="images_shim" class="form-control"
+											<textarea rows="6" id="images_shim" class="form-control"
 												name="images_shim" wicket:message="placeholder:images"
 												required></textarea>
 										</div>
@@ -83,7 +82,7 @@
 									<div class="col-md-12 input-group">
 										<span class="input-group-addon"><i class="glyphicon"
 											wicket:id="comment-fa"></i></span>
-										<textarea rows="10" class="form-control" id="comments"
+										<textarea rows="7" class="form-control" id="comments"
 											wicket:id="comments" name="comments"
 											wicket:message="placeholder:comments" required></textarea>
 									</div>
@@ -115,7 +114,7 @@
 											wicket:id="arrival-calendar-fa"></i></span><input
 											class="input-md form-control" id="arrivalDate"
 											name="arrivalDate" wicket:id="arrivalDate"
-											wicket:message="placeholder:arrival" /> <span
+											wicket:message="placeholder:arrival" required/> <span
 											class="input-group-addon invisible"></span> <span
 											class="input-group-addon"><i class="glyphicon"
 											wicket:id="surgery-calendar-fa"></i></span><input
@@ -169,7 +168,6 @@
 			</div>
 
 			<!-- /row -->
-		</div>
 
 		<form id="upload-file-form" wicket:id="upload-file-form"
 			class="hidden"></form>

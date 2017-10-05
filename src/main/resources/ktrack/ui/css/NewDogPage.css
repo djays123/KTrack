@@ -24,4 +24,10 @@
     z-index:10;
     border:0px;
     background:none;
+    padding: 15px 20px !important;
 }   
+
+.dz-preview {
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+}

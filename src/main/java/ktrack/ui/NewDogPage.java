@@ -247,7 +247,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 						.forReference(new JavaScriptResourceReference(getClass(), "js/locationpicker.jquery.js")),
 				"footer-container"));
 		response.render(new FilteredHeaderItem(
-				JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(), "js/welcomepage.js")),
+				JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(), "js/newdogpage.js")),
 				"footer-container"));
 	}
 
