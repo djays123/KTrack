@@ -220,6 +220,31 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
 		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));
+		
+		Form<Void> deleteFileform = new Form<Void>("delete-uploaded-file-form");
+			
+		HiddenField<String> deletedFileKeyModel = new HiddenField<String>("deleted-file-key", Model.of(new String()), String.class);
+		deleteFileform.add(deletedFileKeyModel);
+		// Form to handle deletion of an image
+		AjaxFormSubmitBehavior deleteFileFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
+			@Override
+			protected void onSubmit(AjaxRequestTarget target) {
+				String deletedFileKey = deletedFileKeyModel.getValue();
+				if (StringUtils.startsWith(deletedFileKey, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
+					deletedFileKey = StringUtils.substringAfter(deletedFileKey, ImagePreview.IMAGE_FILE_ID_PREFIX);
+					dogNamesRepository.removeImage(deletedFileKey);
+				}
+			}
+
+			@Override
+			protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+				super.updateAjaxAttributes(attributes);
+				attributes.setPreventDefault(true);
+			}
+		};
+		
+		deleteFileform.add(deleteFileFormSubmitBehavior);
+		add(deleteFileform);
 	}
 
 	@Override

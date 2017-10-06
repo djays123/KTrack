@@ -17,14 +17,15 @@
 }
 
 .dropzone {
-    overflow: auto;
+    overflow: hidden;
     height: 100%;
     width: 95%;
+    border:1px solid blue;
     position:absolute;
     z-index:10;
     border:0px;
     background:none;
-    padding: 15px 20px !important;
+    padding: 7px 20px !important;
 }   
 
 .dz-preview {

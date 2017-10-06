@@ -64,6 +64,10 @@ $(function() {
 	
 	pictureDropzone.on("removedfile", function(file) {
 		updateImageShim();
+		if(file.fileKey) {
+			$('#deleted-file-key').val(file.fileKey);
+			$('#delete-uploaded-file-form').trigger('submit');
+		}
 	 });
 	
 	pictureDropzone.on("error", function(file) {
