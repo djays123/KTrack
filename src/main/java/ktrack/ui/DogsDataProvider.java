@@ -19,6 +19,10 @@ import ktrack.repository.DogRepository;
 public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	/** The property that shows the dog's images. */
 	protected static final String IMAGE_PROPERTY = "imageIds";
+	
+	/** The id property of the dog. */
+	protected static final String DOG_ID_PROPERTY =  "id" ;
+
 
 	/** The orderable dog properties. */
 	protected static final String[] ORDERABLE_DOG_PROPERTIES = { "name", "age", "sex", "sterilized", "behavior",

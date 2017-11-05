@@ -1,8 +1,8 @@
 $(function() {
 	$('#map-container').locationpicker({
 		location : {
-			latitude : 18.52895184,
-			longitude : 73.87434160
+			latitude : $('#latitude').val(),
+			longitude : $('#longitude').val()
 		},
 		enableAutocomplete : true,
 		enableAutocompleteBlur : true,
@@ -63,11 +63,7 @@ $(function() {
 	 });
 	
 	pictureDropzone.on("removedfile", function(file) {
-		updateImageShim();
-		if(file.fileKey) {
-			$('#deleted-file-key').val(file.fileKey);
-			$('#delete-uploaded-file-form').trigger('submit');
-		}
+		updateImageShim();		
 	 });
 	
 	pictureDropzone.on("error", function(file) {
@@ -75,17 +71,21 @@ $(function() {
 			this.removeFile(file);
 	});
 	
+	var fileAdded = function(file, fileKey) {
+		var fileKeyId = 'file_key_' + fileKey;
+		$('<input>').attr({
+		    type: 'hidden',
+		    id: fileKeyId,
+		    name: fileKeyId,
+		    value : fileKey
+		}).appendTo('#save-dog-form');
+		file.fileKey = fileKeyId;		
+	}
+	
 	pictureDropzone.on("successmultiple", function(files, responseText, e) {
 		var fileKeys = responseText.files;
 		$.each(fileKeys, function( index, fileKey ) {
-			var fileKeyId = 'file_key_' + fileKey;
-			$('<input>').attr({
-			    type: 'hidden',
-			    id: fileKeyId,
-			    name: fileKeyId,
-			    value : fileKey
-			}).appendTo('#save-dog-form');
-			files[index].fileKey = fileKeyId;		
+			fileAdded(files[index], fileKey);
 			
 		});
 	});
@@ -98,5 +98,31 @@ $(function() {
 	
 	var commentsBottom = $('#comments').offset().top + $('#comments').innerHeight();
 	$('#map-container').height(commentsBottom - $('#map-container').offset().top);
+	
+	// For an existing dog show the thumbnails in dropzone
+	if(window.dogData && window.dogData.imageData) {
+		var existingFileCount = 0; // The number of files already uploaded
+		
+		$.each(window.dogData.imageData, function(index, imageData) {
+			// Create the mock file:
+			var mockFile = { name: imageData.fileName, size: imageData.fileSize, accepted: true, existing: true};
+
+		
+			// Call the default addedfile event handler
+			pictureDropzone.emit("addedfile", mockFile);
+			
+			pictureDropzone.createThumbnailFromUrl(mockFile, imageData.snapshotURL, null);
+
+			
+			// Make sure that there is no progress bar, etc...
+			pictureDropzone.emit("complete", mockFile);
+			
+			fileAdded(mockFile, imageData.imageId);
+			
+			pictureDropzone.files.push(mockFile);
+			
+		});
+			
+	}
 	
 });

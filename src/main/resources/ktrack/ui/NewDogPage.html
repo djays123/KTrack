@@ -140,8 +140,8 @@
 										class="input-md form-control" id="location" name="location"
 										wicket:id="location" wicket:message="placeholder:location"
 										required /> <input type="hidden" id="latitude"
-										name="latitude" /> <input type="hidden" id="longitude"
-										name="longitude" />
+										name="latitude" wicket:id="latitude"/> <input type="hidden" id="longitude"
+										name="longitude" wicket:id="longitude"/>
 								</div>
 							</div>
 
@@ -170,13 +170,7 @@
 		<!-- /row -->
 
 		<form id="upload-file-form" wicket:id="upload-file-form"
-			class="hidden"></form>
-
-		<form id="delete-uploaded-file-form" wicket:id="delete-uploaded-file-form"
-			class="hidden">
-			<input type="hidden" id="deleted-file-key" name="deleted-file-key"
-				wicket:id="deleted-file-key" />
-		</form>
+			class="hidden"></form>	
 
 		<div wicket:id="image-preview" id="image-preview"></div>
 	</wicket:extend>

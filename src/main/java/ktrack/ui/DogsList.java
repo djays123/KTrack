@@ -8,6 +8,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.ajax.json.JSONArray;
 import org.apache.wicket.ajax.json.JSONObject;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -15,6 +18,8 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
@@ -127,7 +132,7 @@ public class DogsList extends BaseAuthenticatedPage {
 		ajaxConfig.put(new Key<>("url", null), ajaxUrl);
 		ajaxConfig.put(new Key<>("type", null), "POST");
 		
-		SelectOptions selectOptions = new SelectOptions().style(Style.Multi).selector("td:first-child");
+		SelectOptions selectOptions = new SelectOptions().style(Style.Single).selector("td:not(:last-child)");
 
 		IKey<AbstractConfig> ajaxConfigKey = new Key<>(Options.Ajax.key(), null);
 
@@ -152,6 +157,26 @@ public class DogsList extends BaseAuthenticatedPage {
 		ImagePreview<Void> imagePreview = new ImagePreview<>("image-preview");
 		imagePreview.header(Model.<String>of(getString("view-image")));
 		add(imagePreview);
+		
+		HiddenField<String> editDogKey = new HiddenField<String>("edit-dog-key", Model.of(new String()), String.class);
+		Form<Void> editDog = new Form<Void>("edit-dog") {
+
+			@Override
+			protected void onSubmit() {
+				String dogId = editDogKey.getValue();
+				Dog dogToEdit = dogRepository.findOne(dogId);
+				if(dogToEdit != null) {
+					final PageParameters dogPageParameters = new PageParameters();
+					dogPageParameters.add(NewDogPage.DOG_PARAM, dogId);				
+					setResponsePage(NewDogPage.class, dogPageParameters);
+				}
+			}
+			
+		};
+		
+		editDog.add(editDogKey);
+
+		add(editDog);
 
 	}
 	
@@ -223,6 +248,8 @@ public class DogsList extends BaseAuthenticatedPage {
 					entryJson.put(dogProperty, StringUtils.EMPTY);
 				}
 			}
+			
+			entryJson.put(DogsDataProvider.DOG_ID_PROPERTY, dogPropertyModel.bind(DogsDataProvider.DOG_ID_PROPERTY).getObject());
 		}
 
 		@Override

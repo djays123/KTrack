@@ -16,6 +16,7 @@
 package ktrack.repository;
 
 import java.io.InputStream;
+import java.util.Collection;
 
 import ktrack.entity.DogName;
 import ktrack.entity.Sex;
@@ -39,18 +40,37 @@ public interface DogNamesRepositoryCustom {
 	 */
 	String saveImage(InputStream inputStream, String fileName, String contentType);
 	
-	/**
-	 * Removes the image file specified by the id.
-	 * @param imageFileId The image file id.
-	 */
-	public void removeImage(String imageFileId);
 	
+	 /**
+	  * Removes orphaned images i.e. images that have no dogId specified in their metadata.
+	  */
+	 void removeOrphanedImages();
+	 
+	 /**
+	  * Associates the image ids with the dog id.
+	  */
+	 void associateImages(String dogId, Collection<String> imageIds);
+	 
+	 /**
+	  * Dis-Associates the image ids with the dog id.
+	  */
+	 void disAssociateImages(String dogId, Collection<String> imageIds);
+	 
 	/**
 	 * Returns the image as bytes from the image file specified by the id.
 	 * @param imageFileId The image file id.
 	 * 
 	 * @return The image data as bytes. Null if an error occurs or if the file corresponding to the id does not exist.
 	 */
-	public byte[] getImage(String imageFileId);
+	 byte[] getImage(String imageFileId);
+	
+	
+	/**
+	 * Returns the image file name and length.
+	 * @param imageFileId The image file id
+	 * @return an object array of length 2, the first item is the name of the file and the second
+	 * item is the size of  the file.
+	 */
+	 Object[] getImageNameAndLength(String imageFileId);
 
 }

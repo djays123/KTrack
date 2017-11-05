@@ -3,7 +3,9 @@ package ktrack.ui;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +36,14 @@ import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
+import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -61,6 +67,24 @@ import ktrack.repository.DogRepository;
 @MountPath("/newdog")
 public class NewDogPage extends BaseAuthenticatedPage {
 
+	/**
+	 * The internally used param to store the json representation of the list of
+	 * the dogs image data.
+	 */
+	private static final String DOG_IMAGE_PARAM = "dogImages";
+
+	/** The JS snippet that will hold the image ids of the existing dog. */
+	private static final String DOG_IMAGE_PARAM_JS = "window.dogData = window.dogData || {}; window.dogData.imageData = %s; ";
+
+	/**
+	 * The JS snippet that will hold the thumbnail url of a snapshot of the
+	 * existing dog.
+	 */
+	private static final String DOG_IMAGE_THUMBNALI_PARAM_JS = "%s?imageId=%s";
+
+	/** The key of the page parameter that indicates an existing dog to edit. */
+	protected static final String DOG_PARAM = "dogId";
+
 	/** The initial latitude. */
 	private static final Double LATITUDE = 18.52895184;
 
@@ -75,18 +99,32 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 	@SpringBean
 	private DogRepository dogRepository;
+	
+	/** The dog. */
+	private transient Dog dog;
 
 	/**
 	 * 
 	 * @param pageParams
 	 */
 	public NewDogPage(final PageParameters pageParams) {
-		super(pageParams);
+		super(pageParams);		
 
-		Dog dog = new Dog();
-		dog.setLatitude(LATITUDE);
-		dog.setLongitude(LONGITUDE);
-		dog.setArrivalDate(new Date());
+		String dogId = pageParams.get(DOG_PARAM).toString();
+		boolean isExistingDog = StringUtils.isNotEmpty(dogId);
+		if (isExistingDog) {
+			dog = dogRepository.findOne(dogId);
+		}
+
+		if (dog == null) {
+			dog = new Dog();
+			
+			dog.setLatitude(LATITUDE);
+			dog.setLongitude(LONGITUDE);
+			dog.setArrivalDate(new Date());
+		} 
+	
+
 		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
 		Form<Dog> form = new Form<Dog>("save-dog-form", dogModel);
 		TextField<String> dogName = new TextField<String>("name");
@@ -112,22 +150,18 @@ public class NewDogPage extends BaseAuthenticatedPage {
 					target.add(dogName);
 				}
 
-				List<String> imageIds = new LinkedList();
+				Collection<String> imageIds = new HashSet<>();
 				IRequestParameters postParams = getRequest().getPostParameters();
 				postParams.getParameterNames().forEach(param -> {
 					if (StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
 						imageIds.add(StringUtils.substringAfter(param, ImagePreview.IMAGE_FILE_ID_PREFIX));
 					}
 				});
-
-				dog.getImageIds().forEach(imageId -> {
-					if (!imageIds.contains(imageId)) {
-						dogNamesRepository.removeImage(imageId);
-					}
-				});
+				
 				dog.setImageIds(imageIds);
 				dog.setUserId(((WebApp) getApplication()).getLoggedInUsername());
 				dogRepository.save(dog);
+				dogNamesRepository.associateImages(dog.getId(), imageIds);
 				success(getString("save-success"));
 				feedback.add(new AttributeModifier("class", "add-check alert alert-success"));
 				target.add(feedback);
@@ -153,7 +187,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		form.add(new DateTextField("releaseDate", new DateTextFieldConfig().autoClose(true).withFormat("dd/mm/yyyy")));
 		form.add(new TextField<String>("caregiver"));
 		form.add(new TextField<String>("caregiverMobile"));
-		
+
 		form.add(ajaxFormSubmitBehavior);
 		add(form);
 		add(feedback);
@@ -161,6 +195,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		ImagePreview<Void> imagePreview = new ImagePreview<>("image-preview");
 		imagePreview.header(Model.<String>of(getString("view-image")));
 		add(imagePreview);
+
 		Form uploadFileform = new Form<Void>("upload-file-form") {
 
 			@Override
@@ -219,32 +254,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		form.add(new Icon("caregiverMobile-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.mobile).build()));
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
-		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));
-		
-		Form<Void> deleteFileform = new Form<Void>("delete-uploaded-file-form");
-			
-		HiddenField<String> deletedFileKeyModel = new HiddenField<String>("deleted-file-key", Model.of(new String()), String.class);
-		deleteFileform.add(deletedFileKeyModel);
-		// Form to handle deletion of an image
-		AjaxFormSubmitBehavior deleteFileFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
-			@Override
-			protected void onSubmit(AjaxRequestTarget target) {
-				String deletedFileKey = deletedFileKeyModel.getValue();
-				if (StringUtils.startsWith(deletedFileKey, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
-					deletedFileKey = StringUtils.substringAfter(deletedFileKey, ImagePreview.IMAGE_FILE_ID_PREFIX);
-					dogNamesRepository.removeImage(deletedFileKey);
-				}
-			}
-
-			@Override
-			protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
-				super.updateAjaxAttributes(attributes);
-				attributes.setPreventDefault(true);
-			}
-		};
-		
-		deleteFileform.add(deleteFileFormSubmitBehavior);
-		add(deleteFileform);
+		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));			
 	}
 
 	@Override
@@ -274,7 +284,92 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		response.render(new FilteredHeaderItem(
 				JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(), "js/newdogpage.js")),
 				"footer-container"));
+	
+		if (getPageParameters().get(DOG_PARAM) != null) {			
+			String dogImageDataJSON = getImageJSON(dog);	
+			response.render(JavaScriptHeaderItem.forScript(dogImageDataJSON, DOG_IMAGE_PARAM));
+		}
+
 	}
+
+	/**
+	 * Returns the json data for existing image ids.
+	 */
+	private String getImageJSON(Dog dog) {
+		final SnapshotResource snapshotResource = new SnapshotResource() {
+			@Override
+			protected DogNamesRepository getDogNamesRepository() {
+				return dogNamesRepository;
+			}
+
+			@Override
+			protected boolean isThumbnail() {
+				return true;
+			}
+
+		};
+		final String snapshotUrl = urlFor(new ResourceReference("dogThumbnail") {
+
+			@Override
+			public IResource getResource() {
+				return snapshotResource;
+			}
+
+		}, (PageParameters) null).toString();
+
+		List<DogImage> dogImages = new ArrayList<>();
+
+		for (String imageFileId : dog.getImageIds()) {		
+			Object[] fileInfo = dogNamesRepository.getImageNameAndLength(imageFileId);
+
+			dogImages.add(new DogImage(snapshotUrl, imageFileId, fileInfo[0].toString(), (Long) fileInfo[1]));
+		}
+		
+		
+
+		String json = new Gson().toJson(dogImages);
+		return String.format(DOG_IMAGE_PARAM_JS, json);
+	}
+
+	/**
+	 * Holds the dog's image data.
+	 * 
+	 * @author dsharma
+	 * 
+	 */
+	private static class DogImage {
+		/** The image id. */
+		@SuppressWarnings("unused")
+		private String imageId;
+
+		/** The snapshot url. */
+		@SuppressWarnings("unused")
+		private String snapshotURL;
+
+		/** The file name. */
+		@SuppressWarnings("unused")
+		private String fileName;
+
+		/** The file size. */
+		@SuppressWarnings("unused")
+		private long fileSize;
+
+		/**
+		 * The constructor.
+		 * 
+		 * @param snapshotURL
+		 *            The snapshot URL.
+		 * @param imageId
+		 *            The imageId.
+		 */
+		DogImage(String snapshotURL, String imageId, String fileName, long fileSize) {
+			this.fileName = fileName;
+			this.fileSize = fileSize;
+			this.snapshotURL = String.format(DOG_IMAGE_THUMBNALI_PARAM_JS, snapshotURL, imageId);
+			this.imageId = imageId;
+		}
+
+	};
 
 	/**
 	 * A boolean radio group choice adapted for the dog form.

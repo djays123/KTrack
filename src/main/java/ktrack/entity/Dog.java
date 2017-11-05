@@ -16,21 +16,24 @@
 package ktrack.entity;
 
 import java.io.Serializable;
-import com.querydsl.core.annotations.QueryEntity;
-
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.mongodb.morphia.annotations.Entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.querydsl.core.annotations.QueryEntity;
+
 @QueryEntity
 @Entity
 @Document(collection = "dogs")
 public class Dog implements Serializable {
+	
+	/** Indicates an unknown dog id. */
+	public static final String UNKOWN_ID = "-1";
 	
 	/** The id. */
 	@Id
@@ -53,7 +56,7 @@ public class Dog implements Serializable {
 
 	private Behavior behavior = Behavior.FRIENDLY;
 
-	private List<String> imageIds = new LinkedList<String>();
+	private Collection<String> imageIds = new LinkedList<String>();
 
 	private Double latitude;
 
@@ -205,11 +208,11 @@ public class Dog implements Serializable {
 		this.behavior = behavior;
 	}
 
-	public List<String> getImageIds() {
+	public Collection<String> getImageIds() {
 		return imageIds;
 	}
 
-	public void setImageIds(List<String> imageIds) {
+	public void setImageIds(Collection<String> imageIds) {
 		this.imageIds = imageIds;
 	}
 
