@@ -15,13 +15,15 @@
    
    /usr/bin/mongod --quiet --config /etc/mongod.conf
     * use KTrack
-db.createUser( { user: "admin",
-                 pwd: "crypt*2461",
-                 customData: { },
-                 roles: [ { role: "clusterAdmin", db: "admin" },
-                          { role: "readAnyDatabase", db: "admin" },
-                          "readWrite"] })
+
                           
+                          db.createUser(
+						   {
+						     user: "admin",
+						     pwd: "crypt*2461",
+						     roles: [ "readWrite", "dbAdmin" ]
+						   }
+						);
                           sudo /usr/bin/mongo localhost:27017/KTrack --quiet populatedb.js
                           mongo localhost:27017/KTrack  D:/Installables/eclipseworkspace/ktrack/src/main/resources/populatedb.js
                           
