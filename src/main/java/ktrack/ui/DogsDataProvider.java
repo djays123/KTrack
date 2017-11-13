@@ -83,6 +83,10 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 		}
 		return dogRepository.findAll(new PageRequest((int) first, (int) count)).iterator();
 	}
+	
+	/**
+	 * Returns the query to find 
+	 */
 
 	@Override
 	public long size() {

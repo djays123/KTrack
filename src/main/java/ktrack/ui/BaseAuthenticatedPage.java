@@ -48,7 +48,7 @@ public abstract class BaseAuthenticatedPage extends BasePage {
             protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
                 final List<AbstractLink> subMenu = new ArrayList<AbstractLink>();
 
-                subMenu.add(new MenuBookmarkablePageLink<Void>(NewDogPage.class, searchByDates).setIconType(GlyphIconType.calendar));
+                subMenu.add(new MenuBookmarkablePageLink<Void>(SearchByDates.class, searchByDates).setIconType(GlyphIconType.calendar));
                 subMenu.add(new MenuBookmarkablePageLink<Void>(NewDogPage.class, searchByCaregiver).setIconType(GlyphIconType.user));
               
                 return subMenu;

@@ -213,8 +213,21 @@ public class DogsList extends BaseAuthenticatedPage {
 		
 		
 	}
+	
+	/**
+	 * Returns the data provider for the dogs.
+	 * @param dogRepository The dog repository.
+	 * @param parameters The page parameters.
+	 * @return The dog data providerto populate the dog table.
+	 */
+	protected IDataProvider<Dog> getDogDataProvider(DogRepository dogRepository, PageParameters parameters) {
+		return new DogsDataProvider(dogRepository, parameters);
+	}
+	
 
 	private class DogDataVirtualScrollResourceReference extends AbstractVirtualScrollResourceReference<Dog> {
+		
+		/** The dogs data provider. */
 
 		public DogDataVirtualScrollResourceReference() {
 			super(DogDataVirtualScrollResourceReference.class, "dogsDataVitrualScrollResRef");
@@ -254,7 +267,7 @@ public class DogsList extends BaseAuthenticatedPage {
 
 		@Override
 		protected IDataProvider<Dog> getDataProvider(PageParameters parameters) {
-			return new DogsDataProvider(dogRepository, parameters);
+			return getDogDataProvider(dogRepository, parameters);
 		}
 
 		@Override
