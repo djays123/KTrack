@@ -37,24 +37,8 @@ public abstract class BaseAuthenticatedPage extends BasePage {
 
 		NavbarButton<HomePage> addDogButton = new NavbarButton<>(NewDogPage.class, Model.of(getString("add-dog")));
 		
-		final IModel<String> searchByDates = Model.of(getString("search-dates"));
-		final IModel<String> searchByCaregiver = Model.of(getString("search-caregiver"));
+		NavbarButton<HomePage> searchDogsButton = new NavbarButton<>(Search.class, Model.of(getString("search-dogs")));
 		
-		Component searchDogsButton  = new NavbarDropDownButton(Model.of(getString("search-dogs"))) {
-            /** serialVersionUID. */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
-                final List<AbstractLink> subMenu = new ArrayList<AbstractLink>();
-
-                subMenu.add(new MenuBookmarkablePageLink<Void>(SearchByDates.class, searchByDates).setIconType(GlyphIconType.calendar));
-                subMenu.add(new MenuBookmarkablePageLink<Void>(NewDogPage.class, searchByCaregiver).setIconType(GlyphIconType.user));
-              
-                return subMenu;
-            }
-        }.setIconType(GlyphIconType.search).setVisible(true);
-
 		navbar.addComponents(new ImmutableNavbarComponent(homeButton, Navbar.ComponentPosition.LEFT),
 				new ImmutableNavbarComponent(searchDogsButton, Navbar.ComponentPosition.LEFT),
 				new ImmutableNavbarComponent(addDogButton, Navbar.ComponentPosition.LEFT),

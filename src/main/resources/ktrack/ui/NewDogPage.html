@@ -17,11 +17,7 @@
 										class="input-md form-control" id="name" name="name"
 										wicket:id="name" wicket:message="placeholder:name" autofocus />
 									<span class="input-group-addon invisible"></span> <span
-										class="input-group-addon"><i class="glyphicon"
-										wicket:id="doctor-fa"></i></span><input type="text"
-										class="input-md form-control" id="vetrinarian"
-										name="vetrinarian" wicket:id="vetrinarian"
-										wicket:message="placeholder:vetrinarian" />
+										wicket:id="vetpanel"></span>
 
 
 								</div>
@@ -29,16 +25,7 @@
 							</div>
 							<div class="form-group">
 								<div class="col-md-12 input-group">
-									<span class="input-group-addon"><i class="glyphicon"
-										wicket:id="caregiver-fa"></i></span><input type="text"
-										class="input-md form-control" id="caregiver" name="caregiver"
-										wicket:id="caregiver" wicket:message="placeholder:caregiver" />
-									<span class="input-group-addon invisible"></span> <span
-										class="input-group-addon"><i class="glyphicon"
-										wicket:id="caregiverMobile-fa"></i></span><input type="text"
-										class="input-md form-control" id="caregiverMobile"
-										name="caregiverMobile" wicket:id="caregiverMobile"
-										wicket:message="placeholder:caregiverMobile" />
+									<span wicket:id="caregiverpanel"></span>
 								</div>
 
 							</div>
@@ -52,11 +39,7 @@
 										wicket:id="age" wicket:message="placeholder:age" min="0"
 										step="1" max="15" required /> <span
 										class="input-group-addon invisible"></span> <span
-										class="input-group-addon"><i class="glyphicon"
-										wicket:id="home-fa"></i></span><input type="number"
-										class="input-md form-control" id="kennel" name="kennel"
-										wicket:id="kennel" wicket:message="placeholder:kennel" min="0"
-										step="1" max="999" />
+										wicket:id="kennelPanel">[Kennel Panel]</span>
 								</div>
 
 							</div>
@@ -70,9 +53,9 @@
 									</div>
 									<div class="">
 										<div id="images" class="dropzone"></div>
-										<textarea rows="7" id="images_shim" class="form-control" style="overflow:hidden"
-											name="images_shim" wicket:message="placeholder:images"
-											required></textarea>
+										<textarea rows="7" id="images_shim" class="form-control"
+											style="overflow: hidden" name="images_shim"
+											wicket:message="placeholder:images" required></textarea>
 									</div>
 
 								</div>
@@ -82,8 +65,8 @@
 								<div class="col-md-12 input-group">
 									<span class="input-group-addon"><i class="glyphicon"
 										wicket:id="comment-fa"></i></span>
-									<textarea rows="7" class="form-control" id="comments" style="overflow:hidden"
-										wicket:id="comments" name="comments"
+									<textarea rows="7" class="form-control" id="comments"
+										style="overflow: hidden" wicket:id="comments" name="comments"
 										wicket:message="placeholder:comments" required></textarea>
 								</div>
 							</div>
@@ -109,28 +92,8 @@
 							</div>
 
 							<div class="form-group">
-								<div class="col-md-12 input-group">
-									<span class="input-group-addon"><i class="glyphicon"
-										wicket:id="arrival-calendar-fa"></i></span><input
-										class="input-md form-control" id="arrivalDate"
-										name="arrivalDate" wicket:id="arrivalDate"
-										wicket:message="placeholder:arrival" required /> <span
-										class="input-group-addon invisible"></span> <span
-										class="input-group-addon"><i class="glyphicon"
-										wicket:id="surgery-calendar-fa"></i></span><input
-										class="input-md form-control" id="surgeryDate"
-										name="surgeryDate" wicket:id="surgeryDate"
-										wicket:message="placeholder:surgery" /> <span
-										class="input-group-addon invisible"></span> <span
-										class="input-group-addon"><i class="glyphicon"
-										wicket:id="release-calendar-fa"></i></span><input
-										class="input-md form-control" id="releaseDate"
-										name="releaseDate" wicket:id="releaseDate"
-										wicket:message="placeholder:release" />
-
-
-								</div>
-
+								<div class="col-md-12 input-group" wicket:id="datePanel">
+									[Date Panel]</div>
 							</div>
 
 							<div class="form-group">
@@ -140,8 +103,8 @@
 										class="input-md form-control" id="location" name="location"
 										wicket:id="location" wicket:message="placeholder:location"
 										required /> <input type="hidden" id="latitude"
-										name="latitude" wicket:id="latitude"/> <input type="hidden" id="longitude"
-										name="longitude" wicket:id="longitude"/>
+										name="latitude" wicket:id="latitude" /> <input type="hidden"
+										id="longitude" name="longitude" wicket:id="longitude" />
 								</div>
 							</div>
 
@@ -151,17 +114,7 @@
 
 						</div>
 					</div>
-					<div class="row">
-						<div class="form-group">
-							<div class="col-md-6 input-group">
-								<button type="submit" value="Submit"
-									class="btn btn-primary pull-right">
-									<wicket:message key="save">Hello</wicket:message>
-								</button>
-							</div>
-						</div>
-
-					</div>
+					<span wicket:id="savePanel"></span>
 				</form>
 			</div>
 
@@ -170,7 +123,7 @@
 		<!-- /row -->
 
 		<form id="upload-file-form" wicket:id="upload-file-form"
-			class="hidden"></form>	
+			class="hidden"></form>
 
 		<div wicket:id="image-preview" id="image-preview"></div>
 	</wicket:extend>

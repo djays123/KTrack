@@ -218,7 +218,7 @@ public class DogsList extends BaseAuthenticatedPage {
 	 * Returns the data provider for the dogs.
 	 * @param dogRepository The dog repository.
 	 * @param parameters The page parameters.
-	 * @return The dog data providerto populate the dog table.
+	 * @return The dog data provider to populate the dog table.
 	 */
 	protected IDataProvider<Dog> getDogDataProvider(DogRepository dogRepository, PageParameters parameters) {
 		return new DogsDataProvider(dogRepository, parameters);

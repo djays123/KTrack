@@ -1,0 +1,61 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<head></head>
+<body>
+	<wicket:extend>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="form-group">
+						<span wicket:id="search-by" id="search-by" class="add-check"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="row" >
+				<div class="col-md-12">
+					<form method="POST" wicket:id="search-dog-date-form" class="collapse">
+						<div class="form-group">
+							<div class="col-md-12 input-group">
+								<span wicket:id="datePanel">[Date Panel]</span> <span
+									class="input-group-addon invisible"></span><span
+									wicket:id="kennelPanel">[Kennel Panel]</span>
+							</div>
+						</div>
+
+						<span wicket:id="saveButtonPanel"></span>
+					</form>
+
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<form method="POST" wicket:id="search-dog-vet-form" class="collapse">
+						<div class="form-group">
+							<div class="col-md-4 input-group">
+								<span wicket:id="vetpanel"></span>
+							</div>
+						</div>
+						<span wicket:id="saveButtonPanel"></span>
+					</form>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<form method="POST" wicket:id="search-dog-caregiver-form" class="collapse">
+						<div class="form-group">
+							<div class="col-md-8 input-group">
+								<span wicket:id="caregiverpanel"></span>
+							</div>
+						</div>
+						<span wicket:id="saveButtonPanel"></span>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</wicket:extend>
+</body>
+</html>

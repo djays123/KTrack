@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +39,6 @@ import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import com.google.gson.Gson;
@@ -51,8 +49,6 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons.Type;
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BooleanRadioChoiceRenderer;
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BooleanRadioGroup;
 import de.agilecoders.wicket.core.markup.html.bootstrap.image.Icon;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextFieldConfig;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder.FontAwesomeGraphic;
@@ -63,6 +59,12 @@ import ktrack.entity.Sex;
 import ktrack.entity.Sterilized;
 import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
+import ktrack.ui.panels.CaregiverPanel;
+import ktrack.ui.panels.DatePanel;
+import ktrack.ui.panels.KennelPanel;
+import ktrack.ui.panels.SaveButtonPanel;
+import ktrack.ui.panels.SaveButtonPanel.SaveText;
+import ktrack.ui.panels.VetPanel;
 
 @MountPath("/newdog")
 public class NewDogPage extends BaseAuthenticatedPage {
@@ -175,18 +177,15 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		};
 
 		form.add(dogName);
-		form.add(new TextField<String>("vetrinarian"));
+		form.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
 		form.add(new TextArea<String>("comments"));
 		form.add(new RequiredTextField<String>("location"));
 		form.add(new HiddenField<Double>("latitude", Double.class));
 		form.add(new HiddenField<Double>("longitude", Double.class));
 		form.add(new NumberTextField<Integer>("age", Integer.class).setMinimum(0).setMaximum(15).setStep(1));
-		form.add(new NumberTextField<Integer>("kennel", Integer.class).setMinimum(1).setMaximum(999).setStep(1));
-		form.add(new DateTextField("arrivalDate", new DateTextFieldConfig().autoClose(true).withFormat("dd/mm/yyyy")));
-		form.add(new DateTextField("surgeryDate", new DateTextFieldConfig().autoClose(true).withFormat("dd/mm/yyyy")));
-		form.add(new DateTextField("releaseDate", new DateTextFieldConfig().autoClose(true).withFormat("dd/mm/yyyy")));
-		form.add(new TextField<String>("caregiver"));
-		form.add(new TextField<String>("caregiverMobile"));
+		form.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
+		form.add(new CaregiverPanel("caregiverpanel").setRenderBodyOnly(true));
+		form.add(new DatePanel("datePanel"));
 
 		form.add(ajaxFormSubmitBehavior);
 		add(form);
@@ -241,20 +240,15 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		add(uploadFileform);
 
 		form.add(new Icon("paw-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.paw).build()));
-		form.add(new Icon("home-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.home).build()));
 		form.add(new Icon("location-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.location_arrow).build()));
 		form.add(new Icon("comment-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.comment).build()));
 		form.add(new Icon("photo-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.camera).build()));
 		form.add(new Icon("age-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar_check_o).build()));
-		form.add(new Icon("doctor-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.stethoscope).build()));
-		form.add(new Icon("arrival-calendar-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar).build()));
-		form.add(new Icon("surgery-calendar-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar).build()));
-		form.add(new Icon("release-calendar-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar).build()));
-		form.add(new Icon("caregiver-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.user).build()));
-		form.add(new Icon("caregiverMobile-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.mobile).build()));
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
-		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));			
+		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));	
+		
+		form.add(new SaveButtonPanel("savePanel", SaveText.SAVE).setRenderBodyOnly(true));
 	}
 
 	@Override
