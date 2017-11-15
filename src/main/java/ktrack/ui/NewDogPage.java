@@ -85,7 +85,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 	private static final String DOG_IMAGE_THUMBNALI_PARAM_JS = "%s?imageId=%s";
 
 	/** The key of the page parameter that indicates an existing dog to edit. */
-	protected static final String DOG_PARAM = "dogId";
+	public static final String DOG_PARAM = "dogId";
 
 	/** The initial latitude. */
 	private static final Double LATITUDE = 18.52895184;
