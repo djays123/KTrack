@@ -14,65 +14,81 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.DynamicImageResource;
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 
 import ktrack.repository.DogNamesRepository;
 
-public abstract class SnapshotResource extends DynamicImageResource {
+public class SnapshotResource extends DynamicImageResource {
 	/** The logger. */
 	private static final Logger LOGGER = Logger.getLogger(SnapshotResource.class);
+
+	/**
+	 * The prefix added to names of parameters to identify them as image files
+	 * ids.
+	 */
+	public static final String IMAGE_FILE_ID_PREFIX = "file_key_";
+
+	/**
+	 * The post paramater that can contain the image id.
+	 */
+	private static final String IMAGE_POST_PARAM = "image-file-key";
+
+	/** The dogs names repository. */
+	private DogNamesRepository dogNamesRepository;
+
+	public SnapshotResource(DogNamesRepository dogNamesRepository) {
+		this.dogNamesRepository = dogNamesRepository;
+	}
 
 	@Override
 	protected byte[] getImageData(Attributes attributes) {
 		String imageId = getImageId(attributes);
 
 		if (StringUtils.isNotEmpty(imageId)) {
-			byte[] imageData = getDogNamesRepository().getImage(imageId);
+			byte[] imageData = dogNamesRepository.getImage(imageId);
 			if (imageData != null) {
-				if (!isThumbnail()) {
-					return imageData;
-				} else {
-					try {
-						String format = null;
-						BufferedImage sourceImage = null;
-						ImageInputStream imageStream = ImageIO
-								.createImageInputStream(new ByteArrayInputStream(imageData));
-						Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
-						if (readers.hasNext()) {
-							ImageReader reader = readers.next();
-							format = reader.getFormatName();
-							reader.setInput(imageStream);
-							sourceImage = reader.read(0);
 
-							BufferedImage scaledImg = Scalr.resize(sourceImage, Method.SPEED, Scalr.Mode.AUTOMATIC, 100,
-									50, Scalr.OP_ANTIALIAS);
-							ByteArrayOutputStream baos = new ByteArrayOutputStream();
-							ImageIO.write(scaledImg, format, baos);
-							return baos.toByteArray();
-						}
+				try {
+					String format = null;
+					BufferedImage sourceImage = null;
+					ImageInputStream imageStream = ImageIO.createImageInputStream(new ByteArrayInputStream(imageData));
+					Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
+					if (readers.hasNext()) {
+						ImageReader reader = readers.next();
+						format = reader.getFormatName();
+						reader.setInput(imageStream);
+						sourceImage = reader.read(0);
 
-						LOGGER.warn("Failed to resize image for image id: " + imageId);
-						return imageData;
-
-					} catch (IOException exp) {
-						LOGGER.error("Failed to resize image for image id: " + imageId, exp);
+						BufferedImage scaledImg = Scalr.resize(sourceImage, Method.SPEED, Scalr.Mode.AUTOMATIC, 100, 50,
+								Scalr.OP_ANTIALIAS);
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						ImageIO.write(scaledImg, format, baos);
+						return baos.toByteArray();
 					}
+
+					LOGGER.warn("Failed to resize image for image id: " + imageId);
+					return imageData;
+
+				} catch (IOException exp) {
+					LOGGER.error("Failed to resize image for image id: " + imageId, exp);
 				}
 			}
-
 		}
 
 		return new byte[0];
 	}
 
-	protected abstract DogNamesRepository getDogNamesRepository();
-
-	protected abstract boolean isThumbnail();
-
 	protected String getImageId(Attributes attributes) {
-		PageParameters parameters = attributes.getParameters();
-		return parameters.get("imageId").toString();
+		String imageKey = attributes.getRequest().getPostParameters().getParameterNames().stream()
+				.filter(paramName -> IMAGE_POST_PARAM.equals(paramName)).findFirst().orElse(null);
+		if (StringUtils.isNotEmpty(imageKey)) {
+			return StringUtils.substringAfter(imageKey, IMAGE_FILE_ID_PREFIX);
+		}
+
+		return attributes.getParameters().get("imageId").toString();
 
 	}
 

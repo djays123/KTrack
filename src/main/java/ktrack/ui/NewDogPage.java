@@ -35,9 +35,7 @@ import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.wicketstuff.annotation.mount.MountPath;
 
@@ -101,7 +99,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 	@SpringBean
 	private DogRepository dogRepository;
-	
+
 	/** The dog. */
 	private transient Dog dog;
 
@@ -110,7 +108,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 	 * @param pageParams
 	 */
 	public NewDogPage(final PageParameters pageParams) {
-		super(pageParams);		
+		super(pageParams);
 
 		String dogId = pageParams.get(DOG_PARAM).toString();
 		boolean isExistingDog = StringUtils.isNotEmpty(dogId);
@@ -120,12 +118,11 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 		if (dog == null) {
 			dog = new Dog();
-			
+
 			dog.setLatitude(LATITUDE);
 			dog.setLongitude(LONGITUDE);
 			dog.setArrivalDate(new Date());
-		} 
-	
+		}
 
 		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
 		Form<Dog> form = new Form<Dog>("save-dog-form", dogModel);
@@ -155,11 +152,11 @@ public class NewDogPage extends BaseAuthenticatedPage {
 				Collection<String> imageIds = new HashSet<>();
 				IRequestParameters postParams = getRequest().getPostParameters();
 				postParams.getParameterNames().forEach(param -> {
-					if (StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
-						imageIds.add(StringUtils.substringAfter(param, ImagePreview.IMAGE_FILE_ID_PREFIX));
+					if (StringUtils.startsWith(param, SnapshotResource.IMAGE_FILE_ID_PREFIX)) {
+						imageIds.add(StringUtils.substringAfter(param, SnapshotResource.IMAGE_FILE_ID_PREFIX));
 					}
 				});
-				
+
 				dog.setImageIds(imageIds);
 				dog.setUserId(((WebApp) getApplication()).getLoggedInUsername());
 				dogRepository.save(dog);
@@ -246,8 +243,8 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		form.add(new Icon("age-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar_check_o).build()));
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
-		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));	
-		
+		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));
+
 		form.add(new SaveButtonPanel("savePanel", SaveText.SAVE).setRenderBodyOnly(true));
 	}
 
@@ -278,9 +275,9 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		response.render(new FilteredHeaderItem(
 				JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(), "js/newdogpage.js")),
 				"footer-container"));
-	
-		if (getPageParameters().get(DOG_PARAM) != null) {			
-			String dogImageDataJSON = getImageJSON(dog);	
+
+		if (getPageParameters().get(DOG_PARAM) != null) {
+			String dogImageDataJSON = getImageJSON(dog);
 			response.render(JavaScriptHeaderItem.forScript(dogImageDataJSON, DOG_IMAGE_PARAM));
 		}
 
@@ -290,36 +287,17 @@ public class NewDogPage extends BaseAuthenticatedPage {
 	 * Returns the json data for existing image ids.
 	 */
 	private String getImageJSON(Dog dog) {
-		final SnapshotResource snapshotResource = new SnapshotResource() {
-			@Override
-			protected DogNamesRepository getDogNamesRepository() {
-				return dogNamesRepository;
-			}
 
-			@Override
-			protected boolean isThumbnail() {
-				return true;
-			}
-
-		};
-		final String snapshotUrl = urlFor(new ResourceReference("dogThumbnail") {
-
-			@Override
-			public IResource getResource() {
-				return snapshotResource;
-			}
-
-		}, (PageParameters) null).toString();
+		final String snapshotUrl = urlFor(((WebApp)getApplication()).getSnapshotResourceReference(),
+				(PageParameters) null).toString();
 
 		List<DogImage> dogImages = new ArrayList<>();
 
-		for (String imageFileId : dog.getImageIds()) {		
+		for (String imageFileId : dog.getImageIds()) {
 			Object[] fileInfo = dogNamesRepository.getImageNameAndLength(imageFileId);
 
 			dogImages.add(new DogImage(snapshotUrl, imageFileId, fileInfo[0].toString(), (Long) fileInfo[1]));
 		}
-		
-		
 
 		String json = new Gson().toJson(dogImages);
 		return String.format(DOG_IMAGE_PARAM_JS, json);

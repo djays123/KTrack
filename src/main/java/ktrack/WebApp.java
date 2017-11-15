@@ -1,11 +1,15 @@
 package ktrack;
 
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.request.resource.caching.FilenameWithVersionResourceCachingStrategy;
 import org.apache.wicket.request.resource.caching.NoOpResourceCachingStrategy;
 import org.apache.wicket.request.resource.caching.version.CachingResourceVersion;
 import org.apache.wicket.resource.NoOpTextCompressor;
 import org.apache.wicket.serialize.java.DeflatedJavaSerializer;
 import org.apache.wicket.settings.RequestCycleSettings;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +26,27 @@ import de.agilecoders.wicket.extensions.javascript.YuiCssCompressor;
 import de.agilecoders.wicket.less.BootstrapLess;
 import de.agilecoders.wicket.themes.markup.html.bootswatch.BootswatchTheme;
 import de.agilecoders.wicket.themes.markup.html.bootswatch.BootswatchThemeProvider;
+import ktrack.repository.DogNamesRepository;
+import ktrack.ui.SnapshotResource;
 
 @Component
 public class WebApp extends WicketBootSecuredWebApplication {
-
+	/** The mount path of the snapshot resource. */
+	public static final String IMAGE_RES_REF_PATH = "/dogs/snapshot";
+	
+	/**
+	 * The snapshot resource.
+	 */
+	private SnapshotResource snapshotResource;
+	
+	/**
+	 * The snapshot resource reference.
+	 */
+	private ResourceReference snapshotResourceReference;
+	
+	
+	@Autowired
+	private DogNamesRepository dogNamesRepository;
 
 	@Override
 	protected void init() {
@@ -35,6 +56,18 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		optimizeForWebPerformance();
 
 		getDebugSettings().setAjaxDebugModeEnabled(true);
+		
+		snapshotResource = new SnapshotResource(dogNamesRepository);
+		
+		snapshotResourceReference =  new ResourceReference("dogsSnapshots") {
+
+			@Override
+			public IResource getResource() {
+				return snapshotResource;
+			}
+		};
+		
+		mountResource(IMAGE_RES_REF_PATH, snapshotResourceReference);
 
 	}
 
@@ -53,6 +86,18 @@ public class WebApp extends WicketBootSecuredWebApplication {
 
 		BootstrapLess.install(this);
 	}
+
+	public SnapshotResource getSnapshotResource() {
+		return snapshotResource;
+	}
+
+
+
+	public ResourceReference getSnapshotResourceReference() {
+		return snapshotResourceReference;
+	}
+
+
 
 	/**
 	 * optimize wicket for a better web performance

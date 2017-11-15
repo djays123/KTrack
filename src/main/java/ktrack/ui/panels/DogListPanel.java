@@ -25,9 +25,7 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.template.PackageTextTemplate;
@@ -47,6 +45,7 @@ import de.agilecoders.wicket.jquery.AbstractConfig;
 import de.agilecoders.wicket.jquery.IKey;
 import de.agilecoders.wicket.jquery.Key;
 import de.agilecoders.wicket.jquery.util.Json;
+import ktrack.WebApp;
 import ktrack.entity.Behavior;
 import ktrack.entity.Dog;
 import ktrack.entity.Sex;
@@ -70,7 +69,7 @@ public class DogListPanel extends Panel {
 
 	@SpringBean
 	private DogNamesRepository dogNamesRepository;
-	
+
 	/**
 	 * The query that drives the data provider.
 	 */
@@ -82,7 +81,8 @@ public class DogListPanel extends Panel {
 	 * @param id
 	 *            The panel id.
 	 * @param query
-	 *            The query used to populate the dog list, can be null to indicate all dogs in the system should be displayed.
+	 *            The query used to populate the dog list, can be null to
+	 *            indicate all dogs in the system should be displayed.
 	 */
 	public DogListPanel(String id, Query query) {
 		super(id);
@@ -92,31 +92,13 @@ public class DogListPanel extends Panel {
 
 		List<Column> datatableColumns = new ArrayList<>(DogsDataProvider.DOG_PROPERTIES.length);
 
-		SnapshotResource snapshotResource = new SnapshotResource() {
-			@Override
-			protected DogNamesRepository getDogNamesRepository() {
-				return dogNamesRepository;
-			}
-
-			@Override
-			protected boolean isThumbnail() {
-				return true;
-			}
-
-		};
-		String snapshotUrl = urlFor(new ResourceReference("dogsListSnapshots") {
-
-			@Override
-			public IResource getResource() {
-				return snapshotResource;
-			}
-
-		}, (PageParameters) null).toString();
+		String snapshotUrl = urlFor(((WebApp) getWebApplication()).getSnapshotResourceReference(),
+				(PageParameters) null).toString();
 		TextTemplate renderThumbNailJSCode = new PackageTextTemplate(getClass(), "js/doglist.js", "text/javascript",
 				"UTF-8");
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("SNAPSHOTURL", snapshotUrl);
-		vars.put("PREVIEWKEY", ImagePreview.IMAGE_FILE_ID_PREFIX);
+		vars.put("PREVIEWKEY", SnapshotResource.IMAGE_FILE_ID_PREFIX);
 		String renderFunctionValue = renderThumbNailJSCode.asString(vars);
 
 		for (String dogProperty : DogsDataProvider.DOG_PROPERTIES) {
@@ -135,7 +117,7 @@ public class DogListPanel extends Panel {
 
 		DataTables<Dog, String> table = new DataTables("dogTable", columns);
 		table.addTopToolbar(new SpanHeadersToolbar<>(table));
-		
+
 		CharSequence ajaxUrl = urlFor(new DogDataVirtualScrollResourceReference(), null);
 		ScrollerOptions scrollerOptions = new ScrollerOptions();
 		scrollerOptions.loadingIndicator(true).displayBuffer(100).serverWait(500);
