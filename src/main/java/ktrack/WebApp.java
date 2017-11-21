@@ -27,6 +27,7 @@ import de.agilecoders.wicket.less.BootstrapLess;
 import de.agilecoders.wicket.themes.markup.html.bootswatch.BootswatchTheme;
 import de.agilecoders.wicket.themes.markup.html.bootswatch.BootswatchThemeProvider;
 import ktrack.repository.DogNamesRepository;
+import ktrack.repository.DogRepository;
 import ktrack.ui.SnapshotResource;
 
 @Component
@@ -53,6 +54,10 @@ public class WebApp extends WicketBootSecuredWebApplication {
 	
 	@Autowired
 	private DogNamesRepository dogNamesRepository;
+	
+	@Autowired
+	private DogRepository dogRepository;
+
 
 	@Override
 	protected void init() {
@@ -121,6 +126,10 @@ public class WebApp extends WicketBootSecuredWebApplication {
 	
 	public String getLoggedInUsername() {
 		return SecurityContextHolder.getContext().getAuthentication().getName();
+	}
+	
+	public DogRepository getDogRepository() {
+		return dogRepository;
 	}
 
 }

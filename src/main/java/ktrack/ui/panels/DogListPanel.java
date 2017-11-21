@@ -52,6 +52,8 @@ import ktrack.entity.Sex;
 import ktrack.entity.Sterilized;
 import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
+import ktrack.security.wicket.AuthenticatedSession;
+import ktrack.security.wicket.AuthenticatedSession.AuthenticatedWebSession;
 import ktrack.ui.DogsDataProvider;
 import ktrack.ui.ImagePreview;
 import ktrack.ui.NewDogPage;
@@ -70,10 +72,6 @@ public class DogListPanel extends Panel {
 	@SpringBean
 	private DogNamesRepository dogNamesRepository;
 
-	/**
-	 * The query that drives the data provider.
-	 */
-	private transient Query query;
 
 	/**
 	 * The constructor.
@@ -86,7 +84,7 @@ public class DogListPanel extends Panel {
 	 */
 	public DogListPanel(String id, Query query) {
 		super(id);
-		this.query = query;
+		((AuthenticatedWebSession)getWebSession()).setSearchQuery(query);
 
 		List<IColumn<Dog, ? extends Object>> columns = new ArrayList<>(DogsDataProvider.DOG_PROPERTIES.length);
 
@@ -217,71 +215,6 @@ public class DogListPanel extends Panel {
 				CssHeaderItem.forReference(
 						new CssResourceReference(getPage().getClass(), "css/datatables/buttons.dataTables.min.css")),
 				"footer-container"));
-	}
-
-	private class DogDataVirtualScrollResourceReference extends AbstractVirtualScrollResourceReference<Dog> {
-
-		/** The dogs data provider. */
-
-		public DogDataVirtualScrollResourceReference() {
-			super(DogDataVirtualScrollResourceReference.class, "dogsDataVitrualScrollResRef");
-		}
-
-		@Override
-		protected void populateEntryJson(JSONObject entryJson, Dog dog) {
-			entryJson.put("DT_RowId", "PK_" + dog.getId());
-			entryJson.put("DT_RowClass", "custom");
-
-			/** The map to look up localized values for enums. */
-			final Map<Enum<?>, String> dogPropertyValues = new HashMap<>();
-			dogPropertyValues.put(Sex.M, getString("male"));
-			dogPropertyValues.put(Sex.F, getString("female"));
-			dogPropertyValues.put(Sterilized.NOT_STERLIZED, getString("no"));
-			dogPropertyValues.put(Sterilized.STERLIZED, getString("yes"));
-			dogPropertyValues.put(Behavior.FRIENDLY, getString("friendly"));
-			dogPropertyValues.put(Behavior.AGGRESSIVE, getString("aggressive"));
-
-			CompoundPropertyModel<Dog> dogPropertyModel = CompoundPropertyModel.of(Model.of(dog));
-			for (String dogProperty : DogsDataProvider.DOG_PROPERTIES) {
-				Object value = dogPropertyModel.bind(dogProperty).getObject();
-				if (value != null) {
-					if (value instanceof Collection) {
-						entryJson.put(dogProperty, new JSONArray((Collection<?>) value));
-					} else {
-						value = StringUtils.defaultString(dogPropertyValues.get(value), value.toString());
-						entryJson.put(dogProperty, value);
-					}
-				} else {
-					entryJson.put(dogProperty, StringUtils.EMPTY);
-				}
-			}
-
-			entryJson.put(DogsDataProvider.DOG_ID_PROPERTY,
-					dogPropertyModel.bind(DogsDataProvider.DOG_ID_PROPERTY).getObject());
-		}
-
-		@Override
-		protected IDataProvider<Dog> getDataProvider(PageParameters parameters) {
-			return new DogsDataProvider(dogRepository, parameters, query);
-		}
-
-		@Override
-		protected String generateResponse(PageParameters params) {
-			IRequestParameters parameters = getRequest().getRequestParameters();
-
-			PageParameters pageParameters = new PageParameters();
-			for (String paramName : parameters.getParameterNames()) {
-				List<StringValue> values = parameters.getParameterValues(paramName);
-				String[] valuesArray = new String[values.size()];
-				int i = 0;
-				for (StringValue val : values) {
-					valuesArray[i++] = val.toString();
-				}
-				pageParameters.add(paramName, valuesArray);
-			}
-			return super.generateResponse(pageParameters);
-		}
-
 	}
 
 }

@@ -1,5 +1,7 @@
 package ktrack.entity;
 
+import org.apache.wicket.model.ResourceModel;
+
 public enum Sterilized {
 	STERLIZED {
 
@@ -18,4 +20,9 @@ public enum Sterilized {
 		}
 
 	};
+	
+	public final String getDisplayString() {
+		return new ResourceModel(toString()).getObject();
+	}
+
 }

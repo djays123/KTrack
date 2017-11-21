@@ -74,7 +74,6 @@ public class Search extends BaseAuthenticatedPage {
 		};
 
 		public abstract String getTargetId();
-		// public AjaxFormSubmitBehavior getFormSubmitBehavior();
 
 	};
 

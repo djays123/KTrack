@@ -1,5 +1,7 @@
 package ktrack.entity;
 
+import org.apache.wicket.model.ResourceModel;
+
 public enum Sex {
 	M {
 
@@ -18,5 +20,10 @@ public enum Sex {
 		}
 
 	};
+	
+	
+	public final String getDisplayString() {
+		return new ResourceModel(toString()).getObject();
+	}
 
 }

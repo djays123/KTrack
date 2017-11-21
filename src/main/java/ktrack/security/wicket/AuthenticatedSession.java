@@ -3,6 +3,7 @@ package ktrack.security.wicket;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.request.Request;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,16 @@ public class AuthenticatedSession implements AuthenticatedWebSessionConfig {
 		 * The default serial versions ID
 		 */
 		private static final long serialVersionUID = 1L;
+		
+		/**
+		 * The current search query.
+		 */
+		private Query searchQuery;
+		
+		/**
+		 * The constructor.
+		 * @param request
+		 */
 
 		public AuthenticatedWebSession(Request request) {
 			super(request);
@@ -42,6 +53,14 @@ public class AuthenticatedSession implements AuthenticatedWebSessionConfig {
 		@Override
 		public boolean isSignedIn() {
 			return SecurityContextHolder.getContext().getAuthentication() != null;
+		}
+		
+		public void setSearchQuery(Query searchQuery) {
+			this.searchQuery = searchQuery;
+		}
+		
+		public Query getSearchQuery() {
+			return searchQuery;
 		}
 
 	}
