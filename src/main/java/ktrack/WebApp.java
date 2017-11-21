@@ -37,12 +37,18 @@ public class WebApp extends WicketBootSecuredWebApplication {
 	/**
 	 * The snapshot resource.
 	 */
-	private SnapshotResource snapshotResource;
+	private static SnapshotResource snapshotResource;
 	
 	/**
 	 * The snapshot resource reference.
 	 */
-	private ResourceReference snapshotResourceReference;
+	private static final ResourceReference SNAPSHOT_RES_REF = new ResourceReference("dogsSnapshots") {
+
+		@Override
+		public IResource getResource() {
+			return snapshotResource;
+		}
+	};
 	
 	
 	@Autowired
@@ -59,15 +65,7 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		
 		snapshotResource = new SnapshotResource(dogNamesRepository);
 		
-		snapshotResourceReference =  new ResourceReference("dogsSnapshots") {
-
-			@Override
-			public IResource getResource() {
-				return snapshotResource;
-			}
-		};
-		
-		mountResource(IMAGE_RES_REF_PATH, snapshotResourceReference);
+		mountResource(IMAGE_RES_REF_PATH, SNAPSHOT_RES_REF);
 
 	}
 
@@ -94,7 +92,7 @@ public class WebApp extends WicketBootSecuredWebApplication {
 
 
 	public ResourceReference getSnapshotResourceReference() {
-		return snapshotResourceReference;
+		return SNAPSHOT_RES_REF;
 	}
 
 

@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -26,15 +27,15 @@ public class SnapshotResource extends DynamicImageResource {
 	private static final Logger LOGGER = Logger.getLogger(SnapshotResource.class);
 
 	/**
-	 * The prefix added to names of parameters to identify them as image files
-	 * ids.
+	 * The parameter that holds the image id.
 	 */
-	public static final String IMAGE_FILE_ID_PREFIX = "file_key_";
+	public static final String IMAGE_ID = "imageId";
 
 	/**
-	 * The post paramater that can contain the image id.
+	 * The parameter that holds the flag indicating whether the image is a
+	 * thumbnail.
 	 */
-	private static final String IMAGE_POST_PARAM = "image-file-key";
+	public static final String IMAGE_THUMBNAIL = "image_thumbnail";
 
 	/** The dogs names repository. */
 	private DogNamesRepository dogNamesRepository;
@@ -50,46 +51,45 @@ public class SnapshotResource extends DynamicImageResource {
 		if (StringUtils.isNotEmpty(imageId)) {
 			byte[] imageData = dogNamesRepository.getImage(imageId);
 			if (imageData != null) {
+				if (isImageThumbnail(attributes)) {
+					try {
+						String format = null;
+						BufferedImage sourceImage = null;
+						ImageInputStream imageStream = ImageIO
+								.createImageInputStream(new ByteArrayInputStream(imageData));
+						Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
+						if (readers.hasNext()) {
+							ImageReader reader = readers.next();
+							format = reader.getFormatName();
+							reader.setInput(imageStream);
+							sourceImage = reader.read(0);
 
-				try {
-					String format = null;
-					BufferedImage sourceImage = null;
-					ImageInputStream imageStream = ImageIO.createImageInputStream(new ByteArrayInputStream(imageData));
-					Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
-					if (readers.hasNext()) {
-						ImageReader reader = readers.next();
-						format = reader.getFormatName();
-						reader.setInput(imageStream);
-						sourceImage = reader.read(0);
+							BufferedImage scaledImg = Scalr.resize(sourceImage, Method.SPEED, Scalr.Mode.AUTOMATIC, 100,
+									50, Scalr.OP_ANTIALIAS);
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							ImageIO.write(scaledImg, format, baos);
+							return baos.toByteArray();
+						}
 
-						BufferedImage scaledImg = Scalr.resize(sourceImage, Method.SPEED, Scalr.Mode.AUTOMATIC, 100, 50,
-								Scalr.OP_ANTIALIAS);
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						ImageIO.write(scaledImg, format, baos);
-						return baos.toByteArray();
+						LOGGER.warn("Failed to resize image for image id: " + imageId);
+
+					} catch (IOException exp) {
+						LOGGER.error("Failed to resize image for image id: " + imageId, exp);
 					}
-
-					LOGGER.warn("Failed to resize image for image id: " + imageId);
-					return imageData;
-
-				} catch (IOException exp) {
-					LOGGER.error("Failed to resize image for image id: " + imageId, exp);
 				}
+				return imageData;
 			}
 		}
 
 		return new byte[0];
 	}
 
-	protected String getImageId(Attributes attributes) {
-		String imageKey = attributes.getRequest().getPostParameters().getParameterNames().stream()
-				.filter(paramName -> IMAGE_POST_PARAM.equals(paramName)).findFirst().orElse(null);
-		if (StringUtils.isNotEmpty(imageKey)) {
-			return StringUtils.substringAfter(imageKey, IMAGE_FILE_ID_PREFIX);
-		}
+	private String getImageId(Attributes attributes) {
+		return attributes.getRequest().getQueryParameters().getParameterValue(IMAGE_ID).toString();
+	}
 
-		return attributes.getParameters().get("imageId").toString();
-
+	private boolean isImageThumbnail(Attributes attributes) {
+		return attributes.getRequest().getQueryParameters().getParameterValue(IMAGE_THUMBNAIL).toBoolean(true);
 	}
 
 }

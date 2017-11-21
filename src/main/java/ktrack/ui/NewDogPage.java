@@ -152,8 +152,8 @@ public class NewDogPage extends BaseAuthenticatedPage {
 				Collection<String> imageIds = new HashSet<>();
 				IRequestParameters postParams = getRequest().getPostParameters();
 				postParams.getParameterNames().forEach(param -> {
-					if (StringUtils.startsWith(param, SnapshotResource.IMAGE_FILE_ID_PREFIX)) {
-						imageIds.add(StringUtils.substringAfter(param, SnapshotResource.IMAGE_FILE_ID_PREFIX));
+					if (StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
+						imageIds.add(StringUtils.substringAfter(param, ImagePreview.IMAGE_FILE_ID_PREFIX));
 					}
 				});
 

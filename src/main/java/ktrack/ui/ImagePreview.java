@@ -1,5 +1,7 @@
 package ktrack.ui;
 
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
@@ -8,8 +10,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.resource.DynamicImageResource;
-import org.apache.wicket.request.resource.IResource.Attributes;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
@@ -17,6 +18,17 @@ import ktrack.WebApp;
 import ktrack.repository.DogNamesRepository;
 
 public class ImagePreview<T> extends Modal<T> {
+	/**
+	 * The prefix added to names of parameters to identify them as image files
+	 * ids.
+	 */
+	public static final String IMAGE_FILE_ID_PREFIX = "file_key_";
+
+	/**
+	 * The post paramater that can contain the image id.
+	 */
+	private static final String IMAGE_POST_PARAM = "image-file-key";
+
 	
 
 	@SpringBean
@@ -28,8 +40,6 @@ public class ImagePreview<T> extends Modal<T> {
 
 		Image image = new Image("imgid", "preview");
 		image.setOutputMarkupId(true);
-		image.setMarkupId("imgid");	
-		image.setImageResource(((WebApp)getWebApplication()).getSnapshotResource());
 		add(image);
 
 		Form imagePreviewForm = new Form<Void>("image-preview-form");
@@ -40,6 +50,15 @@ public class ImagePreview<T> extends Modal<T> {
 		AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
+				String imageKey = getRequest().getPostParameters().getParameterValue(IMAGE_POST_PARAM).toOptionalString();
+				PageParameters parameters = new PageParameters();
+				if (StringUtils.isNotEmpty(imageKey)) {
+					parameters.add(SnapshotResource.IMAGE_ID, StringUtils.substringAfter(imageKey, IMAGE_FILE_ID_PREFIX));
+				}
+				parameters.add(SnapshotResource.IMAGE_THUMBNAIL, false);
+				
+				image.setImageResourceReference(((WebApp)getWebApplication()).getSnapshotResourceReference(), parameters);
+
 				target.add(image);
 			}
 

@@ -98,7 +98,7 @@ public class DogListPanel extends Panel {
 				"UTF-8");
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("SNAPSHOTURL", snapshotUrl);
-		vars.put("PREVIEWKEY", SnapshotResource.IMAGE_FILE_ID_PREFIX);
+		vars.put("PREVIEWKEY", ImagePreview.IMAGE_FILE_ID_PREFIX);
 		String renderFunctionValue = renderThumbNailJSCode.asString(vars);
 
 		for (String dogProperty : DogsDataProvider.DOG_PROPERTIES) {
