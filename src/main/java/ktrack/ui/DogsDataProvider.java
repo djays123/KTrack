@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -13,10 +14,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import ktrack.entity.Dog;
+import ktrack.entity.QueryFactory.QUERYPROVIDERS;
 import ktrack.repository.DogRepository;
 
 public class DogsDataProvider extends SortableDataProvider<Dog, String> {
+	/**
+	 * The logger.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(DogsDataProvider.class);
+
 	/** The property that shows the dog's images. */
 	public static final String IMAGE_PROPERTY = "imageIds";
 
@@ -40,20 +50,14 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	private PageParameters pageParameters;
 
 	/**
-	 * The query that drives the data provider.
-	 */
-	private Query query;
-
-	/**
 	 * The constructor.
 	 * 
 	 * @param dogRepository
 	 *            The dog repository.
 	 */
-	public DogsDataProvider(DogRepository dogRepository, PageParameters pageParameters, Query query) {
+	public DogsDataProvider(DogRepository dogRepository, PageParameters pageParameters) {
 		this.dogRepository = dogRepository;
 		this.pageParameters = pageParameters;
-		this.query = query;
 	}
 
 	@Override
@@ -65,11 +69,12 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	public Iterator<? extends Dog> iterator(long first, long count) {
 		String orderColumnIndexParam = pageParameters.get("order[0][column]").toString();
 		String serachText = pageParameters.get("search[value]").toString();
-        boolean isOrderByOrSearch = StringUtils.isNotEmpty(orderColumnIndexParam) || StringUtils.isNotEmpty(serachText);
-		if(isOrderByOrSearch && query == null) {
+		boolean isOrderByOrSearch = StringUtils.isNotEmpty(orderColumnIndexParam) || StringUtils.isNotEmpty(serachText);
+		Query query = getQuery();
+		if (isOrderByOrSearch && query == null) {
 			query = new Query();
 		}
-        
+
 		if (query != null) {
 			if (isOrderByOrSearch) {
 				if (StringUtils.isNotEmpty(orderColumnIndexParam)) {
@@ -100,6 +105,28 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	/**
 	 * Returns the query to find
 	 */
+	private Query getQuery() {
+		String queryProvider = pageParameters.get("queryProvider").toOptionalString();
+		if (StringUtils.isNoneEmpty(queryProvider)) {
+			try {
+				QUERYPROVIDERS dogQueryProvider = QUERYPROVIDERS.valueOf(queryProvider);
+				JsonObject dogJson = new JsonObject();
+				String dogParamPrefix = "dog[";
+				for(String param : pageParameters.getNamedKeys()) {
+					if(StringUtils.startsWith(param, dogParamPrefix)) {
+						String paramName = StringUtils.substringBetween(param, dogParamPrefix, "]");
+						dogJson.addProperty(paramName, pageParameters.get(param).toString());
+					}
+				}
+				return dogQueryProvider.getQueryProvider().getQuery(new Gson().fromJson(dogJson, Dog.class));
+			} catch (IllegalArgumentException illegalArgumentException) {
+				LOGGER.error("Failed to find the query provider for param: " + queryProvider, illegalArgumentException);
+			}
+
+		}
+
+		return null;
+	}
 
 	@Override
 	public long size() {

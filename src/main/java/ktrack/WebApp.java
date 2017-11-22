@@ -8,7 +8,6 @@ import org.apache.wicket.request.resource.caching.version.CachingResourceVersion
 import org.apache.wicket.resource.NoOpTextCompressor;
 import org.apache.wicket.serialize.java.DeflatedJavaSerializer;
 import org.apache.wicket.settings.RequestCycleSettings;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

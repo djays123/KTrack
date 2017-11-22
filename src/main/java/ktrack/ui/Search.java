@@ -1,10 +1,5 @@
 package ktrack.ui;
 
-import java.util.Collection;
-import java.util.HashSet;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
@@ -20,12 +15,9 @@ import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
 import com.google.common.collect.Lists;
 
@@ -33,8 +25,8 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BootstrapRadioGroup;
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.EnumRadioChoiceRenderer;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
-import ktrack.WebApp;
 import ktrack.entity.Dog;
+import ktrack.entity.QueryFactory.QUERYPROVIDERS;
 import ktrack.ui.panels.CaregiverPanel;
 import ktrack.ui.panels.DatePanel;
 import ktrack.ui.panels.DogListPanel;
@@ -47,35 +39,7 @@ public class Search extends BaseAuthenticatedPage {
 	/** The dog. */
 	private transient Dog dog;
 
-	/**
-	 * The search by options.
-	 */
-	private static enum SearchOptions {
-		DATE_KENNEL {
-			@Override
-			public String getTargetId() {
-				return "search-dog-date-form";
-			}
 
-		},
-		CAREGIVER {
-			@Override
-			public String getTargetId() {
-				return "search-dog-caregiver-form";
-			}
-
-		},
-		VET {
-			@Override
-			public String getTargetId() {
-				return "search-dog-vet-form";
-			}
-
-		};
-
-		public abstract String getTargetId();
-
-	};
 
 	/**
 	 * The constructor.
@@ -89,39 +53,39 @@ public class Search extends BaseAuthenticatedPage {
 		dog = new Dog();
 		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
 
-		add(new BootstrapRadioGroup<SearchOptions>("search-by", Model.of(SearchOptions.DATE_KENNEL),
-				Lists.newArrayList(SearchOptions.DATE_KENNEL, SearchOptions.CAREGIVER, SearchOptions.VET),
-				new EnumRadioChoiceRenderer<SearchOptions>(Buttons.Type.Default, this)) {
+		add(new BootstrapRadioGroup<QUERYPROVIDERS>("search-by", Model.of(QUERYPROVIDERS.DATE_KENNEL),
+				Lists.newArrayList(QUERYPROVIDERS.DATE_KENNEL, QUERYPROVIDERS.CAREGIVER, QUERYPROVIDERS.VET),
+				new EnumRadioChoiceRenderer<QUERYPROVIDERS>(Buttons.Type.Default, this)) {
 
 			@Override
-			protected Radio<SearchOptions> newRadio(String id, IModel<SearchOptions> model,
-					RadioGroup<SearchOptions> radioGroup) {
-				Radio<SearchOptions> radio = super.newRadio(id, model, radioGroup);
-				radio.add(new AttributeAppender("data-target", model.getObject().getTargetId()));
+			protected Radio<QUERYPROVIDERS> newRadio(String id, IModel<QUERYPROVIDERS> model,
+					RadioGroup<QUERYPROVIDERS> radioGroup) {
+				Radio<QUERYPROVIDERS> radio = super.newRadio(id, model, radioGroup);
+				radio.add(new AttributeAppender("data-target", getTargetId(model.getObject())));
 				return radio;
 			}
 		});
 
-		Form<Dog> searchDogForm = new Form<Dog>(SearchOptions.DATE_KENNEL.getTargetId(), dogModel);
+		Form<Dog> searchDogForm = new Form<Dog>(getTargetId(QUERYPROVIDERS.DATE_KENNEL), dogModel);
 		searchDogForm.setOutputMarkupId(true);
-		searchDogForm.setMarkupId(SearchOptions.DATE_KENNEL.getTargetId());
+		searchDogForm.setMarkupId(getTargetId(QUERYPROVIDERS.DATE_KENNEL));
 		searchDogForm.add(new DatePanel("datePanel").setRenderBodyOnly(true));
 		searchDogForm.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
 		searchDogForm.add(new SaveButtonPanel("saveButtonPanel", SaveText.SEARCH).setRenderBodyOnly(true));
 		searchDogForm.add(new SearchByKennelOrDates());
 		add(searchDogForm);
 
-		Form<Dog> searchDogByVetForm = new Form<Dog>(SearchOptions.VET.getTargetId(), dogModel);
+		Form<Dog> searchDogByVetForm = new Form<Dog>(getTargetId(QUERYPROVIDERS.VET), dogModel);
 		searchDogByVetForm.setOutputMarkupId(true);
-		searchDogByVetForm.setMarkupId(SearchOptions.VET.getTargetId());
+		searchDogByVetForm.setMarkupId(getTargetId(QUERYPROVIDERS.VET));
 		searchDogByVetForm.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
 		searchDogByVetForm.add(new SaveButtonPanel("saveButtonPanel", SaveText.SEARCH).setRenderBodyOnly(true));
 
 		add(searchDogByVetForm);
 
-		Form<Dog> searchDogByCaregiverForm = new Form<Dog>(SearchOptions.CAREGIVER.getTargetId(), dogModel);
+		Form<Dog> searchDogByCaregiverForm = new Form<Dog>(getTargetId(QUERYPROVIDERS.CAREGIVER), dogModel);
 		searchDogByCaregiverForm.setOutputMarkupId(true);
-		searchDogByCaregiverForm.setMarkupId(SearchOptions.CAREGIVER.getTargetId());
+		searchDogByCaregiverForm.setMarkupId(getTargetId(QUERYPROVIDERS.CAREGIVER));
 		searchDogByCaregiverForm.add(new CaregiverPanel("caregiverpanel").setRenderBodyOnly(true));
 		searchDogByCaregiverForm.add(new SaveButtonPanel("saveButtonPanel", SaveText.SEARCH).setRenderBodyOnly(true));
 
@@ -142,6 +106,23 @@ public class Search extends BaseAuthenticatedPage {
 				"footer-container"));
 		response.render(new FilteredHeaderItem(CssHeaderItem.forReference(FontAwesomeCssReference.instance()),
 				"footer-container"));
+
+	}
+
+	/**
+	 * Returns the target id for the query provider.
+	 */
+	private String getTargetId(QUERYPROVIDERS queryProvider) {
+		switch (queryProvider) {
+		case DATE_KENNEL:
+			return "search-dog-date-form";
+		case CAREGIVER:
+			return "search-dog-caregiver-form";
+		case VET:
+			return "search-dog-vet-form";
+		default:
+			throw new IllegalArgumentException("Unknown queryprovider: " + queryProvider);
+		}
 
 	}
 
@@ -174,7 +155,7 @@ public class Search extends BaseAuthenticatedPage {
 		 * 
 		 * @return the query.
 		 */
-		protected abstract Query getQuery();
+		protected abstract String getQuery();
 	}
 
 	/**
@@ -183,28 +164,8 @@ public class Search extends BaseAuthenticatedPage {
 	private class SearchByKennelOrDates extends SearchBehavior {
 
 		@Override
-		protected Query getQuery() {
-			boolean isQueryFeasible = dog.getArrivalDate() != null || dog.getSurgeryDate() != null
-					|| dog.getReleaseDate() != null || dog.getKennel() != null;
-			if (isQueryFeasible) {
-				Query query = new Query();
-				if(dog.getArrivalDate() != null) {
-					query.addCriteria(Criteria.where("arrivalDate").is(dog.getArrivalDate()));
-				}
-				if(dog.getSurgeryDate() != null) {
-					query.addCriteria(Criteria.where("surgeryDate").is(dog.getSurgeryDate()));
-				}
-				if(dog.getReleaseDate() != null) {
-					query.addCriteria(Criteria.where("releaseDate").is(dog.getReleaseDate()));
-				}
-				if(dog.getKennel() != null) {
-					query.addCriteria(Criteria.where("kennel").is(dog.getKennel()));
-				}
-				
-				return query;
-				
-			}
-			return null;
+		protected String getQuery() {
+			return QUERYPROVIDERS.DATE_KENNEL.getQueryProvider().getQueryString(dog);
 		}
 
 	}

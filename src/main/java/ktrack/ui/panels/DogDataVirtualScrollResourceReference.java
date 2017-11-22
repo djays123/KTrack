@@ -15,7 +15,6 @@ import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
-import org.springframework.data.mongodb.core.query.Query;
 import org.wicketstuff.datatables.virtualscroll.AbstractVirtualScrollResourceReference;
 
 import ktrack.WebApp;
@@ -23,7 +22,6 @@ import ktrack.entity.Behavior;
 import ktrack.entity.Dog;
 import ktrack.entity.Sex;
 import ktrack.entity.Sterilized;
-import ktrack.security.wicket.AuthenticatedSession.AuthenticatedWebSession;
 import ktrack.ui.DogsDataProvider;
 
 public class DogDataVirtualScrollResourceReference extends AbstractVirtualScrollResourceReference<Dog> {
@@ -69,9 +67,7 @@ public class DogDataVirtualScrollResourceReference extends AbstractVirtualScroll
 
 	@Override
 	protected IDataProvider<Dog> getDataProvider(PageParameters parameters) {
-		Query searchQuery = ((AuthenticatedWebSession) AuthenticatedWebSession.get()).getSearchQuery();
-		return new DogsDataProvider(((WebApp) WebApp.get()).getDogRepository(), parameters,
-				searchQuery);
+		return new DogsDataProvider(((WebApp) WebApp.get()).getDogRepository(), parameters);
 	}
 
 	@Override

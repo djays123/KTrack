@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -13,10 +12,7 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.DynamicImageResource;
-import org.apache.wicket.request.resource.IResource;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 

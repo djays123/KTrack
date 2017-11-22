@@ -1,21 +1,12 @@
 package ktrack.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.wicket.Component;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.markup.html.link.AbstractLink;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.MenuBookmarkablePageLink;
-import de.agilecoders.wicket.core.markup.html.bootstrap.image.GlyphIconType;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.ImmutableNavbarComponent;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarButton;
-import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarDropDownButton;
 
 @AuthorizeInstantiation("ROLE_USER")
 public abstract class BaseAuthenticatedPage extends BasePage {
