@@ -112,12 +112,11 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 				QUERYPROVIDERS dogQueryProvider = QUERYPROVIDERS.valueOf(queryProvider);
 				JsonObject dogJson = new JsonObject();
 				String dogParamPrefix = "dog[";
-				for(String param : pageParameters.getNamedKeys()) {
-					if(StringUtils.startsWith(param, dogParamPrefix)) {
-						String paramName = StringUtils.substringBetween(param, dogParamPrefix, "]");
-						dogJson.addProperty(paramName, pageParameters.get(param).toString());
-					}
-				}
+				pageParameters.getNamedKeys().stream().filter(param -> StringUtils.startsWith(param, dogParamPrefix)).forEach(param -> {
+					String paramName = StringUtils.substringBetween(param, dogParamPrefix, "]");
+					dogJson.addProperty(paramName, pageParameters.get(param).toString());
+				});
+				
 				return dogQueryProvider.getQueryProvider().getQuery(new Gson().fromJson(dogJson, Dog.class));
 			} catch (IllegalArgumentException illegalArgumentException) {
 				LOGGER.error("Failed to find the query provider for param: " + queryProvider, illegalArgumentException);
