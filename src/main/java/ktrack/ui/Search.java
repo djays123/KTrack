@@ -26,6 +26,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BootstrapRadi
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.EnumRadioChoiceRenderer;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
 import ktrack.entity.Dog;
+import ktrack.entity.QueryFactory.IDogQuery;
 import ktrack.entity.QueryFactory.QUERYPROVIDERS;
 import ktrack.ui.panels.CaregiverPanel;
 import ktrack.ui.panels.DatePanel;
@@ -68,7 +69,7 @@ public class Search extends BaseAuthenticatedPage {
 		searchDogForm.add(new DatePanel("datePanel").setRenderBodyOnly(true));
 		searchDogForm.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
 		searchDogForm.add(new SaveButtonPanel("saveButtonPanel", SaveText.SEARCH).setRenderBodyOnly(true));
-		searchDogForm.add(new SearchByKennelOrDates());
+		searchDogForm.add(new SearchBehavior(QUERYPROVIDERS.DATE_KENNEL.getQueryProvider()));
 		add(searchDogForm);
 
 		Form<Dog> searchDogByVetForm = new Form<Dog>(getTargetId(QUERYPROVIDERS.VET), dogModel);
@@ -76,7 +77,7 @@ public class Search extends BaseAuthenticatedPage {
 		searchDogByVetForm.setMarkupId(getTargetId(QUERYPROVIDERS.VET));
 		searchDogByVetForm.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
 		searchDogByVetForm.add(new SaveButtonPanel("saveButtonPanel", SaveText.SEARCH).setRenderBodyOnly(true));
-
+		searchDogByVetForm.add(new SearchBehavior(QUERYPROVIDERS.VET.getQueryProvider()));
 		add(searchDogByVetForm);
 
 		Form<Dog> searchDogByCaregiverForm = new Form<Dog>(getTargetId(QUERYPROVIDERS.CAREGIVER), dogModel);
@@ -84,7 +85,7 @@ public class Search extends BaseAuthenticatedPage {
 		searchDogByCaregiverForm.setMarkupId(getTargetId(QUERYPROVIDERS.CAREGIVER));
 		searchDogByCaregiverForm.add(new CaregiverPanel("caregiverpanel").setRenderBodyOnly(true));
 		searchDogByCaregiverForm.add(new SaveButtonPanel("saveButtonPanel", SaveText.SEARCH).setRenderBodyOnly(true));
-
+		searchDogByCaregiverForm.add(new SearchBehavior(QUERYPROVIDERS.CAREGIVER.getQueryProvider()));
 		add(searchDogByCaregiverForm);
 
 		add(new EmptyPanel("dog-list-panel").setOutputMarkupId(true));
@@ -127,14 +128,23 @@ public class Search extends BaseAuthenticatedPage {
 	 * 
 	 * @author dsharma
 	 */
-	private abstract class SearchBehavior extends AjaxFormSubmitBehavior {
-		public SearchBehavior() {
+	private class SearchBehavior extends AjaxFormSubmitBehavior {
+		/** The query provider. */
+		private IDogQuery queryProvider;
+		
+		/**
+		 * The constructor.
+		 * @param queryProvider
+		 */
+		public SearchBehavior(IDogQuery queryProvider) {
 			super("submit");
+			this.queryProvider = queryProvider;
 		}
 
 		@Override
-		protected final void onSubmit(AjaxRequestTarget target) {
-			DogListPanel panel = new DogListPanel("dog-list-panel", getQuery());
+		protected final void onSubmit(AjaxRequestTarget target) {		
+			Dog dog = (Dog)getForm().getModel().getObject();
+			DogListPanel panel = new DogListPanel("dog-list-panel", queryProvider.getQueryString(dog));
 			panel.setOutputMarkupId(true);
 			Search.this.addOrReplace(panel);
 			target.add(panel);
@@ -145,26 +155,5 @@ public class Search extends BaseAuthenticatedPage {
 			super.updateAjaxAttributes(attributes);
 			attributes.setPreventDefault(true);
 		}
-
-		/**
-		 * Returns the query that drives the search.
-		 * 
-		 * @return the query.
-		 */
-		protected abstract String getQuery();
 	}
-
-	/**
-	 * Class that implements the search by date and kennel behavior.
-	 */
-	private class SearchByKennelOrDates extends SearchBehavior {
-
-		@Override
-		protected String getQuery() {
-			Dog dog = (Dog)getForm().getModel().getObject();
-			return QUERYPROVIDERS.DATE_KENNEL.getQueryProvider().getQueryString(dog);
-		}
-
-	}
-
 }
