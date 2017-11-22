@@ -10,6 +10,7 @@ $(function() {
 		if(currentActivePanelId !== activePanelId) {
 			$('.collapse').collapse("hide");
 			$('#' + activePanelId).collapse("toggle");
+			$('#dog-list-panel').hide();
 		}
 		
 

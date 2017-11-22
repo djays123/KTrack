@@ -88,7 +88,7 @@ public class Search extends BaseAuthenticatedPage {
 		searchDogByCaregiverForm.add(new SearchBehavior(QUERYPROVIDERS.CAREGIVER.getQueryProvider()));
 		add(searchDogByCaregiverForm);
 
-		add(new EmptyPanel("dog-list-panel").setOutputMarkupId(true));
+		add(new EmptyPanel("dog-list-panel").setOutputMarkupId(true).setMarkupId("dog-list-panel"));
 
 	}
 
@@ -146,6 +146,7 @@ public class Search extends BaseAuthenticatedPage {
 			Dog dog = (Dog)getForm().getModel().getObject();
 			DogListPanel panel = new DogListPanel("dog-list-panel", queryProvider.getQueryString(dog));
 			panel.setOutputMarkupId(true);
+			panel.setMarkupId("dog-list-panel");
 			Search.this.addOrReplace(panel);
 			target.add(panel);
 		}
