@@ -31,7 +31,6 @@ import org.wicketstuff.datatables.options.ScrollerOptions;
 import org.wicketstuff.datatables.options.SelectOptions;
 import org.wicketstuff.datatables.options.SelectOptions.Style;
 
-import com.fasterxml.jackson.databind.util.RawValue;
 
 import de.agilecoders.wicket.jquery.AbstractConfig;
 import de.agilecoders.wicket.jquery.IKey;
@@ -112,7 +111,7 @@ public class DogListPanel extends Panel {
 		ajaxConfig.put(new Key<>("url", null), ajaxUrl);
 		ajaxConfig.put(new Key<>("type", null), "POST");
 		if(query != null) {
-			ajaxConfig.put(new Key<>("data", null), new RawValue(query));
+			ajaxConfig.put(new Key<>("data", null), new Json.RawValue(query));
 		}
 		
 

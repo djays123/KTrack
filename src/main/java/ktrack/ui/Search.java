@@ -36,11 +36,7 @@ import ktrack.ui.panels.SaveButtonPanel.SaveText;
 import ktrack.ui.panels.VetPanel;
 
 public class Search extends BaseAuthenticatedPage {
-	/** The dog. */
-	private transient Dog dog;
-
-
-
+	
 	/**
 	 * The constructor.
 	 * 
@@ -50,7 +46,7 @@ public class Search extends BaseAuthenticatedPage {
 
 	public Search(PageParameters pageParams) {
 		super(pageParams);
-		dog = new Dog();
+		Dog dog = new Dog();
 		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
 
 		add(new BootstrapRadioGroup<QUERYPROVIDERS>("search-by", Model.of(QUERYPROVIDERS.DATE_KENNEL),
@@ -165,6 +161,7 @@ public class Search extends BaseAuthenticatedPage {
 
 		@Override
 		protected String getQuery() {
+			Dog dog = (Dog)getForm().getModel().getObject();
 			return QUERYPROVIDERS.DATE_KENNEL.getQueryProvider().getQueryString(dog);
 		}
 
