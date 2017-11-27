@@ -4,18 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.MetaDataHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.head.filter.HeaderResponseContainer;
 import org.apache.wicket.markup.html.GenericWebPage;
+import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.string.StringValue;
 
 import de.agilecoders.wicket.core.Bootstrap;
@@ -30,6 +35,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.image.GlyphIconType;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.ImmutableNavbarComponent;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarDropDownButton;
+import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarText;
 import de.agilecoders.wicket.core.markup.html.references.BootlintHeaderItem;
 import de.agilecoders.wicket.core.markup.html.references.RespondJavaScriptReference;
 import de.agilecoders.wicket.core.settings.IBootstrapSettings;
@@ -56,6 +62,14 @@ public class BasePage<T> extends GenericWebPage<T> {
 
 		add(newNavbar("navbar"));
 		add(new HeaderResponseContainer("footer-container", "footer-container"));
+
+		Navbar footer = new Navbar("footer-navbar");
+		footer.setPosition(Navbar.Position.BOTTOM);
+		footer.addComponents(new NavbarText(footer.newExtraItemId(), getString("copyright"))
+				.position(Navbar.ComponentPosition.LEFT));
+
+		add(footer);
+
 	}
 
 	/**
@@ -75,10 +89,23 @@ public class BasePage<T> extends GenericWebPage<T> {
 	 * @return a new {@link Navbar} instance
 	 */
 	protected Navbar newNavbar(String markupId) {
-		Navbar navbar = new Navbar(markupId) ;
+		Navbar navbar = new Navbar(markupId) {
+
+			@Override
+			protected Image newBrandImage(String markupId) {
+				Image img = super.newBrandImage(markupId);
+				img.add(AttributeModifier.replace("width", "80%"));
+				img.add(AttributeModifier.replace("height", "80%"));
+
+				return img;
+			}
+
+		};
 
 		navbar.setPosition(Navbar.Position.TOP);
-		
+		navbar.setBrandName(Model.<String>of(getString("brandname")));
+		navbar.setBrandImage(new PackageResourceReference(BasePage.class, "ccc.png"), Model.<String>of());
+
 		addNavbarComponents(navbar);
 
 		DropDownButton dropdown = new NavbarDropDownButton(Model.of(getString("themes"))) {
@@ -171,6 +198,9 @@ public class BasePage<T> extends GenericWebPage<T> {
 		if (!getRequest().getRequestParameters().getParameterValue("bootlint").isNull()) {
 			response.render(BootlintHeaderItem.INSTANCE);
 		}
+
+		ResourceReference faviconRef = new PackageResourceReference(BasePage.class, "favicon.png");
+		response.render(MetaDataHeaderItem.forLinkTag("shortcut icon", urlFor(faviconRef, null).toString()));
 	}
 
 }

@@ -65,7 +65,7 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		configureBootstrap();
 		optimizeForWebPerformance();
 
-		getDebugSettings().setAjaxDebugModeEnabled(true);
+	//	getDebugSettings().setAjaxDebugModeEnabled(true);
 		
 		snapshotResource = new SnapshotResource(dogNamesRepository);
 		

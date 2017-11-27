@@ -26,9 +26,7 @@ public class HomePage extends BasePage {
 		
 	}
 	
-	protected void addNavbarComponents(final Navbar navbar) {
-		navbar.setBrandName(Model.of(getString("navbar-brand")));
-	};
+	
 
 	
 }
