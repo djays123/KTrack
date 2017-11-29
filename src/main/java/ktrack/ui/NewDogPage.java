@@ -1,13 +1,8 @@
 package ktrack.ui;
 
-import java.io.IOException;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.AttributeModifier;
@@ -20,28 +15,18 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.NumberTextField;
-import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.protocol.http.IMultipartWebRequest;
-import org.apache.wicket.request.IRequestCycle;
-import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.IRequestParameters;
-import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.wicketstuff.annotation.mount.MountPath;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons.Type;
 import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BooleanRadioChoiceRenderer;
@@ -60,40 +45,15 @@ import ktrack.repository.DogRepository;
 import ktrack.ui.panels.CaregiverPanel;
 import ktrack.ui.panels.DatePanel;
 import ktrack.ui.panels.KennelPanel;
+import ktrack.ui.panels.LocationPanel;
 import ktrack.ui.panels.SaveButtonPanel;
 import ktrack.ui.panels.SaveButtonPanel.SaveText;
+import ktrack.ui.panels.SnapshotPanel;
 import ktrack.ui.panels.VetPanel;
 
 @MountPath("/newdog")
 public class NewDogPage extends BaseAuthenticatedPage {
-
-	/**
-	 * The internally used param to store the json representation of the list of
-	 * the dogs image data.
-	 */
-	private static final String DOG_IMAGE_PARAM = "dogImages";
-
-	/** The JS snippet that will hold the image ids of the existing dog. */
-	private static final String DOG_IMAGE_PARAM_JS = "window.dogData = window.dogData || {}; window.dogData.imageData = %s; ";
-
-	/**
-	 * The JS snippet that will hold the thumbnail url of a snapshot of the
-	 * existing dog.
-	 */
-	private static final String DOG_IMAGE_THUMBNALI_PARAM_JS = "%s?imageId=%s";
-
-	/** The key of the page parameter that indicates an existing dog to edit. */
-	public static final String DOG_PARAM = "dogId";
-
-	/** The initial latitude. */
-	private static final Double LATITUDE = 18.52895184;
-
-	/** The initial longitude. */
-	private static final Double LONGITUDE = 73.87434160;
-
-	/** The google maps API key. */
-	private static String GOOGLE_MAPS_KEY = "AIzaSyCCBGibN4Tkk59VRZ2AtFnJdqTPK6PymNQ";
-
+	
 	@SpringBean
 	private DogNamesRepository dogNamesRepository;
 
@@ -110,7 +70,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 	public NewDogPage(final PageParameters pageParams) {
 		super(pageParams);
 
-		String dogId = pageParams.get(DOG_PARAM).toString();
+		String dogId = pageParams.get(SnapshotPanel.DOG_PARAM).toString();
 		boolean isExistingDog = StringUtils.isNotEmpty(dogId);
 		if (isExistingDog) {
 			dog = dogRepository.findOne(dogId);
@@ -118,9 +78,6 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 		if (dog == null) {
 			dog = new Dog();
-
-			dog.setLatitude(LATITUDE);
-			dog.setLongitude(LONGITUDE);
 			dog.setArrivalDate(new Date());
 		}
 
@@ -176,9 +133,8 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		form.add(dogName);
 		form.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
 		form.add(new TextArea<String>("comments"));
-		form.add(new RequiredTextField<String>("location"));
-		form.add(new HiddenField<Double>("latitude", Double.class));
-		form.add(new HiddenField<Double>("longitude", Double.class));
+		form.add(new LocationPanel("locationPanel", isExistingDog ? null : dog).setRenderBodyOnly(true));
+		form.add(new SnapshotPanel("snapshot-panel", isExistingDog ? null : dog, "upload-file-form", this).setRenderBodyOnly(true));
 		form.add(new NumberTextField<Integer>("age", Integer.class).setMinimum(0).setMaximum(15).setStep(1));
 		form.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
 		form.add(new CaregiverPanel("caregiverpanel").setRenderBodyOnly(true));
@@ -188,58 +144,10 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		add(form);
 		add(feedback);
 
-		ImagePreview<Void> imagePreview = new ImagePreview<>("image-preview");
-		imagePreview.header(Model.<String>of(getString("view-image")));
-		add(imagePreview);
 
-		Form uploadFileform = new Form<Void>("upload-file-form") {
-
-			@Override
-			protected void onSubmit() {
-
-				IMultipartWebRequest webRequest = (IMultipartWebRequest) getRequest();
-				Map<String, List<org.apache.commons.fileupload.FileItem>> files = webRequest.getFiles();
-				List<org.apache.commons.fileupload.FileItem> fileUploads = new ArrayList<>();
-				files.values().forEach(listFileItem -> listFileItem.forEach(fileItem -> fileUploads.add(fileItem)));
-				final JsonArray fileKeys = new JsonArray();
-				for (org.apache.commons.fileupload.FileItem uploadedFile : fileUploads) {
-					String fileName = uploadedFile.getName();
-					try {
-						String fileId = dogNamesRepository.saveImage(uploadedFile.getInputStream(), fileName,
-								URLConnection.guessContentTypeFromName(fileName));
-						fileKeys.add(fileId);
-						dog.getImageIds().add(fileId);
-					} catch (IOException ioException) {
-						throw new IllegalArgumentException("Failed to create uploaded file: " + fileName);
-					}
-				}
-
-				getRequestCycle().scheduleRequestHandlerAfterCurrent(new IRequestHandler() {
-					@Override
-					public void detach(IRequestCycle reqCycle) {
-					}
-
-					@Override
-					public void respond(IRequestCycle requestCycle) {
-						WebResponse webResponse = (WebResponse) requestCycle.getResponse();
-						webResponse.setContentType("application/json");
-						JsonObject filesData = new JsonObject();
-						filesData.add("files", fileKeys);
-						webResponse.write(filesData.toString());
-
-					}
-				});
-
-			}
-
-		};
-		uploadFileform.setMultiPart(true);
-		add(uploadFileform);
 
 		form.add(new Icon("paw-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.paw).build()));
-		form.add(new Icon("location-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.location_arrow).build()));
 		form.add(new Icon("comment-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.comment).build()));
-		form.add(new Icon("photo-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.camera).build()));
 		form.add(new Icon("age-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar_check_o).build()));
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
@@ -251,97 +159,21 @@ public class NewDogPage extends BaseAuthenticatedPage {
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
-		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
-				new JavaScriptResourceReference(getClass(), "js/dropzone.js", getLocale(), getStyle(), getVariation())),
-				"footer-container"));
-		response.render(new FilteredHeaderItem(
-				CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/dropzone.css")),
-				"footer-container"));
-		response.render(new FilteredHeaderItem(CssHeaderItem.forReference(FontAwesomeCssReference.instance()),
-				"footer-container"));
-
-		response.render(new FilteredHeaderItem(
-				JavaScriptHeaderItem
-						.forUrl("http://maps.google.com/maps/api/js?key=" + GOOGLE_MAPS_KEY + "&libraries=places"),
+			response.render(new FilteredHeaderItem(CssHeaderItem.forReference(FontAwesomeCssReference.instance()),
 				"footer-container"));
 		response.render(new FilteredHeaderItem(
 				CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/NewDogPage.css")),
 				"footer-container"));
 
 		response.render(new FilteredHeaderItem(
-				JavaScriptHeaderItem
-						.forReference(new JavaScriptResourceReference(getClass(), "js/locationpicker.jquery.js")),
-				"footer-container"));
-		response.render(new FilteredHeaderItem(
 				JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(), "js/newdogpage.js")),
 				"footer-container"));
 
-		if (getPageParameters().get(DOG_PARAM) != null) {
-			String dogImageDataJSON = getImageJSON(dog);
-			response.render(JavaScriptHeaderItem.forScript(dogImageDataJSON, DOG_IMAGE_PARAM));
-		}
-
+	
 	}
 
-	/**
-	 * Returns the json data for existing image ids.
-	 */
-	private String getImageJSON(Dog dog) {
-
-		final String snapshotUrl = urlFor(((WebApp)getApplication()).getSnapshotResourceReference(),
-				(PageParameters) null).toString();
-
-		List<DogImage> dogImages = new ArrayList<>();
-
-		for (String imageFileId : dog.getImageIds()) {
-			Object[] fileInfo = dogNamesRepository.getImageNameAndLength(imageFileId);
-
-			dogImages.add(new DogImage(snapshotUrl, imageFileId, fileInfo[0].toString(), (Long) fileInfo[1]));
-		}
-
-		String json = new Gson().toJson(dogImages);
-		return String.format(DOG_IMAGE_PARAM_JS, json);
-	}
-
-	/**
-	 * Holds the dog's image data.
-	 * 
-	 * @author dsharma
-	 * 
-	 */
-	private static class DogImage {
-		/** The image id. */
-		@SuppressWarnings("unused")
-		private String imageId;
-
-		/** The snapshot url. */
-		@SuppressWarnings("unused")
-		private String snapshotURL;
-
-		/** The file name. */
-		@SuppressWarnings("unused")
-		private String fileName;
-
-		/** The file size. */
-		@SuppressWarnings("unused")
-		private long fileSize;
-
-		/**
-		 * The constructor.
-		 * 
-		 * @param snapshotURL
-		 *            The snapshot URL.
-		 * @param imageId
-		 *            The imageId.
-		 */
-		DogImage(String snapshotURL, String imageId, String fileName, long fileSize) {
-			this.fileName = fileName;
-			this.fileSize = fileSize;
-			this.snapshotURL = String.format(DOG_IMAGE_THUMBNALI_PARAM_JS, snapshotURL, imageId);
-			this.imageId = imageId;
-		}
-
-	};
+	
+	
 
 	/**
 	 * A boolean radio group choice adapted for the dog form.

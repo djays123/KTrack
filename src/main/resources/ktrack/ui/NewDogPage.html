@@ -48,15 +48,7 @@
 
 							<div class="form-group " id="image-container">
 								<div class="col-md-12 input-group">
-									<div class="input-group-addon">
-										<i class="glyphicon" wicket:id="photo-fa"></i>
-									</div>
-									<div class="">
-										<div id="images" class="dropzone"></div>
-										<textarea rows="7" id="images_shim" class="form-control"
-											style="overflow: hidden" name="images_shim"
-											wicket:message="placeholder:images" required></textarea>
-									</div>
+									<div wicket:id="snapshot-panel">[Snapshot Panel]</div>
 
 								</div>
 
@@ -98,13 +90,7 @@
 
 							<div class="form-group">
 								<div class=" input-group">
-									<span class="input-group-addon"><i class="glyphicon"
-										wicket:id="location-fa"></i></span> <input type="text"
-										class="input-md form-control" id="location" name="location"
-										wicket:id="location" wicket:message="placeholder:location"
-										required /> <input type="hidden" id="latitude"
-										name="latitude" wicket:id="latitude" /> <input type="hidden"
-										id="longitude" name="longitude" wicket:id="longitude" />
+									<div wicket:id="locationPanel">[Location Panel]</div>
 								</div>
 							</div>
 
@@ -121,11 +107,10 @@
 		</div>
 
 		<!-- /row -->
-
-		<form id="upload-file-form" wicket:id="upload-file-form"
+	<form id="upload-file-form" wicket:id="upload-file-form" method="POST"
 			class="hidden"></form>
 
-		<div wicket:id="image-preview" id="image-preview"></div>
+		
 	</wicket:extend>
 </body>
 </html>

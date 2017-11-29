@@ -151,7 +151,7 @@ public class DogListPanel extends Panel {
 				Dog dogToEdit = dogRepository.findOne(dogId);
 				if (dogToEdit != null) {
 					final PageParameters dogPageParameters = new PageParameters();
-					dogPageParameters.add(NewDogPage.DOG_PARAM, dogId);
+					dogPageParameters.add(SnapshotPanel.DOG_PARAM, dogId);
 					setResponsePage(NewDogPage.class, dogPageParameters);
 				}
 			}
