@@ -15,9 +15,7 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.NumberTextField;
 import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
@@ -44,6 +42,7 @@ import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
 import ktrack.ui.panels.CaregiverPanel;
 import ktrack.ui.panels.DatePanel;
+import ktrack.ui.panels.DogInfoPanel;
 import ktrack.ui.panels.KennelPanel;
 import ktrack.ui.panels.LocationPanel;
 import ktrack.ui.panels.SaveButtonPanel;
@@ -83,8 +82,11 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
 		Form<Dog> form = new Form<Dog>("save-dog-form", dogModel);
-		TextField<String> dogName = new TextField<String>("name");
-		dogName.setOutputMarkupId(true);
+		DogInfoPanel dogInfoPanel = new DogInfoPanel("dogInfoPanel");
+		dogInfoPanel.setOutputMarkupId(true).setRenderBodyOnly(true);
+		form.add(dogInfoPanel);
+		
+		
 		FeedbackPanel feedback = new FeedbackPanel("feedback") {
 			@Override
 			protected String getCSSClass(FeedbackMessage message) {
@@ -101,10 +103,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
-				if (StringUtils.isEmpty(dog.getName())) {
-					dog.setName(dogNamesRepository.getRandomName(dog.getSex()).getName());
-					target.add(dogName);
-				}
+				dogInfoPanel.update(target);
 
 				Collection<String> imageIds = new HashSet<>();
 				IRequestParameters postParams = getRequest().getPostParameters();
@@ -130,12 +129,11 @@ public class NewDogPage extends BaseAuthenticatedPage {
 			}
 		};
 
-		form.add(dogName);
+		
 		form.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
 		form.add(new TextArea<String>("comments"));
 		form.add(new LocationPanel("locationPanel", isExistingDog ? null : dog).setRenderBodyOnly(true));
-		form.add(new SnapshotPanel("snapshot-panel", isExistingDog ? null : dog, "upload-file-form", this).setRenderBodyOnly(true));
-		form.add(new NumberTextField<Integer>("age", Integer.class).setMinimum(0).setMaximum(15).setStep(1));
+		form.add(new SnapshotPanel("snapshot-panel", isExistingDog ? null : dog, "upload-file-form", "image-preview", this).setRenderBodyOnly(true));
 		form.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
 		form.add(new CaregiverPanel("caregiverpanel").setRenderBodyOnly(true));
 		form.add(new DatePanel("datePanel"));
@@ -146,9 +144,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 
 
-		form.add(new Icon("paw-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.paw).build()));
 		form.add(new Icon("comment-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.comment).build()));
-		form.add(new Icon("age-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.calendar_check_o).build()));
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
 		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));

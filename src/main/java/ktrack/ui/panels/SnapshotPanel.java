@@ -60,15 +60,15 @@ public class SnapshotPanel extends Panel {
 	/** The dog. */
 	private transient Dog dog;
 
-	public SnapshotPanel(String id, Dog dog, String uploadFormId, MarkupContainer parent) {
+	public SnapshotPanel(String id, Dog dog, String uploadFormId, String imagePreviewId, MarkupContainer parent) {
 		super(id);
 		this.dog = dog;
 
-		ImagePreview<Void> imagePreview = new ImagePreview<>("image-preview");
+		ImagePreview<Void> imagePreview = new ImagePreview<>(imagePreviewId);
 		imagePreview.header(Model.<String>of(getString("view-image")));
 		add(new Icon("photo-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.camera).build()));
 
-		add(imagePreview);
+		parent.add(imagePreview);
 
 		Form<Void> uploadFileform = new Form<Void>(uploadFormId) {
 

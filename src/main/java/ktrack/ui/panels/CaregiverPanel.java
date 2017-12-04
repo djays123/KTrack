@@ -12,9 +12,11 @@ public class CaregiverPanel extends Panel {
 		super(id);
 		add(new TextField<String>("caregiver"));
 		add(new TextField<String>("caregiverMobile"));
+		add(new TextField<String>("caregiverEmail"));
 		
 		add(new Icon("caregiver-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.user).build()));
 		add(new Icon("caregiverMobile-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.mobile).build()));
+		add(new Icon("caregiverEmail-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.envelope).build()));
 
 	
 	}

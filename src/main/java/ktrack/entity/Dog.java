@@ -83,7 +83,17 @@ public class Dog implements Serializable {
 	
 	private String caregiverMobile;
 	
+	private String caregiverEmail;
 	
+	
+	public String getCaregiverEmail() {
+		return caregiverEmail;
+	}
+
+	public void setCaregiverEmail(String caregiverEmail) {
+		this.caregiverEmail = caregiverEmail;
+	}
+
 	public String getCaregiver() {
 		return caregiver;
 	}
