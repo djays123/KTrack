@@ -11,14 +11,14 @@
 						<div class="col-md-6" id="left-col">
 
 							<div class="form-group">
-								<div class="col-md-12 input-group">
+								<div class="col-md-12 input-group input-group-sm">
 									<span wicket:id="dogInfoPanel"></span>
 								</div>
 
 							</div>
 							
 							<div class="form-group">
-								<div class="col-md-12 input-group">
+								<div class="col-md-12 input-group input-group-sm">
 									<span
 										wicket:id="vetpanel"></span> 
 										<span
@@ -29,7 +29,7 @@
 							
 							
 							<div class="form-group">
-								<div class="col-md-12 input-group">
+								<div class="col-md-12 input-group input-group-sm">
 									<span wicket:id="caregiverpanel"></span>
 								</div>
 
@@ -39,49 +39,43 @@
 
 
 							<div class="form-group " id="image-container">
-								<div class="col-md-12 input-group">
-									<div wicket:id="snapshot-panel">[Snapshot Panel]</div>
+								<div class="col-md-12 input-group input-group-sm">
+									<span wicket:id="snapshot-panel">[Snapshot Panel]</span>
 
 								</div>
 
 							</div>
 							<div class="form-group" id="comment-group">
-								<div class="col-md-12 input-group">
-									<span class="input-group-addon"><i class="glyphicon"
-										wicket:id="comment-fa"></i></span>
-									<textarea rows="7" class="form-control" id="comments"
-										style="overflow: hidden" wicket:id="comments" name="comments"
-										wicket:message="placeholder:comments" required></textarea>
+								<div class="col-md-12 input-group ">
+									<span wicket:id="comment-panel">[Comment Panel]</span>
 								</div>
 							</div>
 
 
 						</div>
 						<div class="col-md-6" id="right-col">
-							<div class="form-group">
 								<div class="row ">
 									<div class="col-md-12">
 										<span wicket:id="sex" class="add-check"></span> <span
 											wicket:id="sterilized" class="add-check"></span>
+										<span wicket:id="behavior" class="add-check"></span>
 									</div>
-
-								</div>
 							</div>
 							<div class="form-group">
 								<div class="row ">
 									<div class="col-md-6">
-										<span wicket:id="behavior" class="add-check"></span>
+										
 									</div>
 								</div>
 							</div>
 
 							<div class="form-group">
-								<div class="col-md-12 input-group" wicket:id="datePanel">
+								<div class="col-md-12 input-group input-group-sm" wicket:id="datePanel">
 									[Date Panel]</div>
 							</div>
 
 							<div class="form-group">
-								<div class=" input-group">
+								<div class=" input-group input-group-sm">
 									<div wicket:id="locationPanel">[Location Panel]</div>
 								</div>
 							</div>

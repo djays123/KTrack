@@ -15,9 +15,12 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.Radio;
+import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -41,6 +44,7 @@ import ktrack.entity.Sterilized;
 import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
 import ktrack.ui.panels.CaregiverPanel;
+import ktrack.ui.panels.CommentPanel;
 import ktrack.ui.panels.DatePanel;
 import ktrack.ui.panels.DogInfoPanel;
 import ktrack.ui.panels.KennelPanel;
@@ -48,6 +52,7 @@ import ktrack.ui.panels.LocationPanel;
 import ktrack.ui.panels.SaveButtonPanel;
 import ktrack.ui.panels.SaveButtonPanel.SaveText;
 import ktrack.ui.panels.SnapshotPanel;
+import ktrack.ui.panels.StatusPanel;
 import ktrack.ui.panels.VetPanel;
 
 @MountPath("/newdog")
@@ -87,19 +92,8 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		form.add(dogInfoPanel);
 		
 		
-		FeedbackPanel feedback = new FeedbackPanel("feedback") {
-			@Override
-			protected String getCSSClass(FeedbackMessage message) {
-				switch (message.getLevel()) {
-				case FeedbackMessage.SUCCESS:
-					return "active list-unstyled";
-				}
-
-				return super.getCSSClass(message);
-			}
-		};
-		feedback.setOutputMarkupId(true);
-
+		FeedbackPanel feedback = new StatusPanel("feedback");
+	
 		AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target) {
@@ -118,7 +112,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 				dogRepository.save(dog);
 				dogNamesRepository.associateImages(dog.getId(), imageIds);
 				success(getString("save-success"));
-				feedback.add(new AttributeModifier("class", "add-check alert alert-success"));
+				feedback.add(new AttributeModifier("class", "add-check"));
 				target.add(feedback);
 			}
 
@@ -131,7 +125,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 		
 		form.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
-		form.add(new TextArea<String>("comments"));
+		form.add(new CommentPanel("comment-panel").setRenderBodyOnly(true));
 		form.add(new LocationPanel("locationPanel", isExistingDog ? null : dog).setRenderBodyOnly(true));
 		form.add(new SnapshotPanel("snapshot-panel", isExistingDog ? null : dog, "upload-file-form", "image-preview", this).setRenderBodyOnly(true));
 		form.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
@@ -144,7 +138,6 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 
 
-		form.add(new Icon("comment-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.comment).build()));
 		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
 		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));
@@ -219,11 +212,10 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 				@Override
 				public String getButtonClass(Boolean option) {
-					return Type.Primary.cssClassName() + " btn-md small";
+					return Type.Primary.cssClassName() + " btn-sm small ";
 				}
 			});
 		}
-
 	}
 
 }
