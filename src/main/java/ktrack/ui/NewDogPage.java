@@ -129,7 +129,7 @@ public class NewDogPage extends BaseAuthenticatedPage {
 		form.add(new LocationPanel("locationPanel", isExistingDog ? null : dog).setRenderBodyOnly(true));
 		form.add(new SnapshotPanel("snapshot-panel", isExistingDog ? null : dog, "upload-file-form", "image-preview", this).setRenderBodyOnly(true));
 		form.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
-		form.add(new CaregiverPanel("caregiverpanel").setRenderBodyOnly(true));
+		form.add(new CaregiverPanel("caregiverpanel", true).setRenderBodyOnly(true));
 		form.add(new DatePanel("datePanel"));
 
 		form.add(ajaxFormSubmitBehavior);

@@ -83,7 +83,7 @@ public class Search extends BaseAuthenticatedPage {
 		Form<Dog> searchDogByCaregiverForm = new Form<Dog>(getTargetId(QUERYPROVIDERS.CAREGIVER), dogModel);
 		searchDogByCaregiverForm.setOutputMarkupId(true);
 		searchDogByCaregiverForm.setMarkupId(getTargetId(QUERYPROVIDERS.CAREGIVER));
-		searchDogByCaregiverForm.add(new CaregiverPanel("caregiverpanel").setRenderBodyOnly(true));
+		searchDogByCaregiverForm.add(new CaregiverPanel("caregiverpanel", false).setRenderBodyOnly(true));
 		searchDogByCaregiverForm.add(new SaveButtonPanel("saveButtonPanel", SaveText.SEARCH).setRenderBodyOnly(true));
 		searchDogByCaregiverForm.add(new SearchBehavior(QUERYPROVIDERS.CAREGIVER.getQueryProvider()));
 		add(searchDogByCaregiverForm);

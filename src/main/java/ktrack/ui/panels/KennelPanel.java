@@ -17,7 +17,7 @@ public class KennelPanel extends Panel {
 		super(id);
 		add(new Icon("home-fa", FontAwesomeIconTypeBuilder.on(FontAwesomeGraphic.home).build()));
 
-		add(new NumberTextField<Integer>("kennel", Integer.class).setMinimum(1).setMaximum(999).setStep(1));
+		add(new NumberTextField<Integer>("kennel", Integer.class).setMinimum(1).setMaximum(65).setStep(1));
 
 	}
 
