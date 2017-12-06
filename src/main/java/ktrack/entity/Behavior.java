@@ -19,6 +19,15 @@ public enum Behavior {
 			return "aggressive";
 		}
 
+	},
+	
+	TIMID {
+
+		@Override
+		public String toString() {
+			return "timid";
+		}
+
 	};
 	
 	public final String getDisplayString() {

@@ -9,18 +9,13 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
-import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.Radio;
-import org.apache.wicket.markup.html.form.RadioGroup;
-import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -29,28 +24,23 @@ import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.wicketstuff.annotation.mount.MountPath;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons.Type;
-import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BooleanRadioChoiceRenderer;
-import de.agilecoders.wicket.core.markup.html.bootstrap.form.radio.BooleanRadioGroup;
-import de.agilecoders.wicket.core.markup.html.bootstrap.image.Icon;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder.FontAwesomeGraphic;
 import ktrack.WebApp;
-import ktrack.entity.Behavior;
 import ktrack.entity.Dog;
-import ktrack.entity.Sex;
 import ktrack.entity.Sterilized;
 import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
+import ktrack.ui.panels.BehaviorPanel;
 import ktrack.ui.panels.CaregiverPanel;
 import ktrack.ui.panels.CommentPanel;
 import ktrack.ui.panels.DatePanel;
+import ktrack.ui.panels.DogAttributeBooleanRadioGroup;
 import ktrack.ui.panels.DogInfoPanel;
 import ktrack.ui.panels.KennelPanel;
 import ktrack.ui.panels.LocationPanel;
 import ktrack.ui.panels.SaveButtonPanel;
 import ktrack.ui.panels.SaveButtonPanel.SaveText;
+import ktrack.ui.panels.SexPanel;
 import ktrack.ui.panels.SnapshotPanel;
 import ktrack.ui.panels.StatusPanel;
 import ktrack.ui.panels.VetPanel;
@@ -138,9 +128,9 @@ public class NewDogPage extends BaseAuthenticatedPage {
 
 
 
-		form.add(new DogAttributeBooleanRadioGroup("sex", dogModel, "sex", Sex.class));
+		form.add(new SexPanel("sex", dogModel, "sex"));
 		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
-		form.add(new DogAttributeBooleanRadioGroup("behavior", dogModel, "behavior", Behavior.class));
+		form.add(new BehaviorPanel("behavior", dogModel, "behavior"));
 
 		form.add(new SaveButtonPanel("savePanel", SaveText.SAVE).setRenderBodyOnly(true));
 	}
@@ -164,58 +154,6 @@ public class NewDogPage extends BaseAuthenticatedPage {
 	
 	
 
-	/**
-	 * A boolean radio group choice adapted for the dog form.
-	 * 
-	 * @author dsharma
-	 *
-	 */
-	private class DogAttributeBooleanRadioGroup extends BooleanRadioGroup {
-		/** The enum holding the boolean options. */
-		private Class<? extends Enum> choiceClazz;
-
-		public DogAttributeBooleanRadioGroup(String id, final CompoundPropertyModel compoundModel, String property,
-				Class<? extends Enum> choiceClazz) {
-			super(id, new Model<Boolean>() {
-				/**
-				 * @see org.apache.wicket.model.IModel#getObject()
-				 */
-				@Override
-				public Boolean getObject() {
-					Enum<?> model = (Enum<?>) compoundModel.bind(property).getObject();
-					return model.equals(choiceClazz.getEnumConstants()[0]) ? true : false;
-				}
-
-				/**
-				 * Set the model object; calls setObject(java.io.Serializable).
-				 * The model object must be serializable, as it is stored in the
-				 * session
-				 * 
-				 * @param object
-				 *            the model object
-				 * @see org.apache.wicket.model.IModel#setObject(Object)
-				 */
-				@Override
-				public void setObject(final Boolean object) {
-					Enum<?> model = object ? choiceClazz.getEnumConstants()[0] : choiceClazz.getEnumConstants()[1];
-					compoundModel.<Enum<?>>bind(property).setObject(model);
-				}
-
-			});
-			this.choiceClazz = choiceClazz;
-			setChoiceRenderer(new BooleanRadioChoiceRenderer(Type.Primary, this) {
-				@Override
-				protected String resourceKey(Boolean choice) {
-					return choice ? choiceClazz.getEnumConstants()[0].toString()
-							: choiceClazz.getEnumConstants()[1].toString();
-				}
-
-				@Override
-				public String getButtonClass(Boolean option) {
-					return Type.Primary.cssClassName() + " btn-sm small ";
-				}
-			});
-		}
-	}
+	
 
 }

@@ -131,7 +131,7 @@ public class QueryFactory {
 
 		@Override
 		protected final QUERYPROVIDERS getQueryProvider() {
-			return QUERYPROVIDERS.CAREGIVER;
+			return QUERYPROVIDERS.VET;
 		}
 
 	}

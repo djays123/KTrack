@@ -10,6 +10,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.head.filter.FilteredHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.HiddenField;
@@ -76,7 +77,7 @@ public class DogListPanel extends Panel {
 
 		String snapshotUrl = urlFor(((WebApp) getWebApplication()).getSnapshotResourceReference(),
 				(PageParameters) null).toString();
-		TextTemplate renderThumbNailJSCode = new PackageTextTemplate(getClass(), "js/doglist.js", "text/javascript",
+		TextTemplate renderThumbNailJSCode = new PackageTextTemplate(getClass(), "js/doglistsnapshotrender.js", "text/javascript",
 				"UTF-8");
 		Map<String, Object> vars = new HashMap<String, Object>();
 		vars.put("SNAPSHOTURL", snapshotUrl);
@@ -112,8 +113,7 @@ public class DogListPanel extends Panel {
 		ajaxConfig.put(new Key<>("type", null), "POST");
 		if(query != null) {
 			ajaxConfig.put(new Key<>("data", null), new Json.RawValue(query));
-		}
-		
+		} 
 
 		SelectOptions selectOptions = new SelectOptions().style(Style.Single).selector("td:not(:last-child)");
 
@@ -166,6 +166,8 @@ public class DogListPanel extends Panel {
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
+		response.render(OnDomReadyHeaderItem.forScript(new PackageTextTemplate(getClass(), "js/doglistpanel.js", "text/javascript",
+				"UTF-8").asString()));
 		response.render(new FilteredHeaderItem(
 				JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getPage().getClass(),
 						"js/datatables/dataTables.buttons.min.js", getLocale(), getStyle(), getVariation())),

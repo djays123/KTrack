@@ -98,9 +98,6 @@ public class Search extends BaseAuthenticatedPage {
 		response.render(new FilteredHeaderItem(JavaScriptHeaderItem.forReference(
 				new JavaScriptResourceReference(getClass(), "js/search.js", getLocale(), getStyle(), getVariation())),
 				"footer-container"));
-		response.render(new FilteredHeaderItem(
-				CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/NewDogPage.css")),
-				"footer-container"));
 		response.render(new FilteredHeaderItem(CssHeaderItem.forReference(FontAwesomeCssReference.instance()),
 				"footer-container"));
 

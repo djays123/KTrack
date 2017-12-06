@@ -1,6 +1,7 @@
 package ktrack.ui;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,11 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 	 * The page parameters - these hold information like sorting and searching.
 	 */
 	private PageParameters pageParameters;
+	
+	/**
+	 * The total records.
+	 */
+	private long totalRecords;
 
 	/**
 	 * The constructor.
@@ -76,6 +82,7 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 		}
 
 		if (query != null) {
+			PageRequest request = new PageRequest((int) first, (int) count);
 			if (isOrderByOrSearch) {
 				if (StringUtils.isNotEmpty(orderColumnIndexParam)) {
 					Integer orderColumnIndex = Integer.parseInt(orderColumnIndexParam);
@@ -84,11 +91,10 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 					Sort.Direction sortDirection = StringUtils.equalsIgnoreCase("asc", columnOrderDir)
 							? Sort.Direction.ASC
 							: Sort.Direction.DESC;
-					PageRequest request = new PageRequest((int) first, (int) count,
+					request = new PageRequest((int) first, (int) count,
 							new Sort(sortDirection, columnData));
-					query.with(request);
 				}
-
+				query.with(request);
 				if (StringUtils.isNotEmpty(serachText)) {
 					// Create TextCriteria
 					TextCriteria criteria = TextCriteria.forDefaultLanguage().caseSensitive(false)
@@ -97,8 +103,11 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 				}
 
 			}
-			return dogRepository.findBy(query).iterator();
+			List<Dog> results = dogRepository.findBy(query);
+			totalRecords = results.size();
+			return results.iterator();
 		}
+		totalRecords = dogRepository.count();
 		return dogRepository.findAll(new PageRequest((int) first, (int) count)).iterator();
 	}
 
@@ -130,7 +139,7 @@ public class DogsDataProvider extends SortableDataProvider<Dog, String> {
 
 	@Override
 	public long size() {
-		return dogRepository.count();
+		return totalRecords;
 	}
 
 	@Override
