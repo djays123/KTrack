@@ -34,6 +34,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.html.MobileViewportMetaT
 import de.agilecoders.wicket.core.markup.html.bootstrap.image.GlyphIconType;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.ImmutableNavbarComponent;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
+import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarButton;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarDropDownButton;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarText;
 import de.agilecoders.wicket.core.markup.html.references.BootlintHeaderItem;
@@ -105,6 +106,11 @@ public class BasePage<T> extends GenericWebPage<T> {
 		navbar.setPosition(Navbar.Position.TOP);
 		navbar.setBrandName(Model.<String>of(getString("brandname")));
 		navbar.setBrandImage(new PackageResourceReference(BasePage.class, "ccc.png"), Model.<String>of());
+		
+		NavbarButton<HomePage> bookSlotButton = new NavbarButton<>(BookSlot.class, Model.of(getString("book-slot")));
+	    
+        navbar.addComponents(new ImmutableNavbarComponent(bookSlotButton, Navbar.ComponentPosition.RIGHT));
+
 
 		addNavbarComponents(navbar);
 
@@ -145,7 +151,6 @@ public class BasePage<T> extends GenericWebPage<T> {
 	 * @param navbar
 	 */
 	protected void addNavbarComponents(final Navbar navbar) {
-
 	};
 
 	/**
