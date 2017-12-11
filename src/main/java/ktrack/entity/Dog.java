@@ -226,7 +226,7 @@ public class Dog implements Serializable {
 		this.imageIds = imageIds;
 	}
 
-	public double getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 
@@ -234,7 +234,7 @@ public class Dog implements Serializable {
 		this.latitude = latitude;
 	}
 
-	public double getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 

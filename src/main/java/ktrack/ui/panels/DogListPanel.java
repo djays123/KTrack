@@ -32,7 +32,6 @@ import org.wicketstuff.datatables.options.ScrollerOptions;
 import org.wicketstuff.datatables.options.SelectOptions;
 import org.wicketstuff.datatables.options.SelectOptions.Style;
 
-
 import de.agilecoders.wicket.jquery.AbstractConfig;
 import de.agilecoders.wicket.jquery.IKey;
 import de.agilecoders.wicket.jquery.Key;
@@ -42,8 +41,8 @@ import ktrack.entity.Dog;
 import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
 import ktrack.ui.DogsDataProvider;
+import ktrack.ui.EditDogPage;
 import ktrack.ui.ImagePreview;
-import ktrack.ui.NewDogPage;
 
 /**
  * The panel that displays a list of dogs.
@@ -152,7 +151,7 @@ public class DogListPanel extends Panel {
 				if (dogToEdit != null) {
 					final PageParameters dogPageParameters = new PageParameters();
 					dogPageParameters.add(SnapshotPanel.DOG_PARAM, dogId);
-					setResponsePage(NewDogPage.class, dogPageParameters);
+					setResponsePage(EditDogPage.class, dogPageParameters);
 				}
 			}
 

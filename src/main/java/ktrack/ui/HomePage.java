@@ -1,13 +1,13 @@
 package ktrack.ui;
 
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
 
 import com.giffing.wicket.spring.boot.context.scan.WicketHomePage;
 import com.giffing.wicket.spring.boot.context.scan.WicketSignInPage;
-
-import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
 
 @WicketHomePage
 @WicketSignInPage
@@ -22,9 +22,15 @@ public class HomePage extends BasePage {
 		super(pageParams);
 		Label loginError = new Label("login-error", getString("login-failed"));
 		loginError.setVisible(!pageParams.get("error").isNull());
-		add(loginError);	
-		
+		add(loginError);			
 	}
+	
+	  @Override
+	   public void renderHead(IHeaderResponse response) {
+	      super.renderHead(response);
+	      response.render(CssHeaderItem.forCSS("body{ background-image: url('" + urlFor(new PackageResourceReference(getClass(), "banner-homepage.jpg"), null) + "');};", "uniqueBodyBackground"));
+	   }
+
 	
 	
 
