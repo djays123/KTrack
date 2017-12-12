@@ -33,7 +33,6 @@ import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIc
 import ktrack.WebApp;
 import ktrack.entity.Dog;
 import ktrack.repository.DogNamesRepository;
-import ktrack.ui.ImagePreview;
 
 public class SnapshotPanel extends Panel {
 	/** The key of the page parameter that indicates an existing dog to edit. */

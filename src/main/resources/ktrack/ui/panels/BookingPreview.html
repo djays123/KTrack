@@ -1,0 +1,26 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<head></head>
+<body>
+	<wicket:extend>
+		<div class="row">
+			<form id="slot-booking-form" wicket:id="slot-booking-form"
+				name="slot-booking-form" method="POST">
+				<div class="form-group">
+					<div class="col-md-10">
+						<span class="input-group input-group-sm"><span
+							wicket:id="caregiverPanel"></span></span>
+					</div>
+					<div class="col-md-2">
+						<span class="input-group input-group-sm"> <span
+							wicket:id="kennelPanel"></span>
+						</span>
+					</div>
+				</div>
+
+				<input type="hidden" id="slot-booking-date"
+					wicket:id="slot-booking-date" name="slot-booking-date" />
+			</form>
+		</div>
+	</wicket:extend>
+</body>
+</html>

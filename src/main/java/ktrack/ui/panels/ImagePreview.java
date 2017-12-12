@@ -1,4 +1,4 @@
-package ktrack.ui;
+package ktrack.ui.panels;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -14,6 +14,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
 import ktrack.WebApp;
 import ktrack.repository.DogNamesRepository;
+import ktrack.ui.SnapshotResource;
 
 public class ImagePreview<T> extends Modal<T> {
 	/**

@@ -42,7 +42,6 @@ import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
 import ktrack.ui.DogsDataProvider;
 import ktrack.ui.EditDogPage;
-import ktrack.ui.ImagePreview;
 
 /**
  * The panel that displays a list of dogs.

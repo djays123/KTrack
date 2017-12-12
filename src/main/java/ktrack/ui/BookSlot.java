@@ -13,6 +13,8 @@ import org.apache.wicket.util.template.PackageTextTemplate;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
+import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
+import ktrack.ui.panels.BookingPreview;
 
 @MountPath("/book")
 public class BookSlot extends BaseAuthenticatedPage {
@@ -26,19 +28,22 @@ public class BookSlot extends BaseAuthenticatedPage {
 
 	public BookSlot(final PageParameters pageParams) {
 		super(pageParams);	
+		add(new BookingPreview<>("booking-preview"));
 		
 	}
 	
 	   @Override
 	    public void renderHead(IHeaderResponse response) {
 	        super.renderHead(response);
+	        response.render(new FilteredHeaderItem(CssHeaderItem.forReference(FontAwesomeCssReference.instance()),
+	                "footer-container"));
 	        response.render(new FilteredHeaderItem(
 	                JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getPage().getClass(),
 	                        "js/bookslot.js", getLocale(), getStyle(), getVariation())),
 	                "footer-container"));
 	        response.render(new FilteredHeaderItem(
 	                JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getPage().getClass(),
-	                        "js/zabuto/zabuto_calendar.min.js", getLocale(), getStyle(), getVariation())),
+	                        "js/zabuto/zabuto_calendar.js", getLocale(), getStyle(), getVariation())),
 	                "footer-container"));
 	       
 

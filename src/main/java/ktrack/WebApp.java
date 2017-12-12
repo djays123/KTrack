@@ -1,5 +1,6 @@
 package ktrack;
 
+import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.request.resource.caching.FilenameWithVersionResourceCachingStrategy;
@@ -130,5 +131,12 @@ public class WebApp extends WicketBootSecuredWebApplication {
 	public DogRepository getDogRepository() {
 		return dogRepository;
 	}
+	
+	@Override
+    public RuntimeConfigurationType getConfigurationType() {
+
+        return RuntimeConfigurationType.DEVELOPMENT;
+
+    }
 
 }

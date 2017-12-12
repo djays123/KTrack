@@ -32,6 +32,9 @@ $.fn.zabuto_calendar = function (options) {
         $calendarElement.data('navIcons', opts.nav_icon);
         $calendarElement.data('dowLabels', opts.dow_labels);
         $calendarElement.data('showToday', opts.today);
+        $calendarElement.data('disableNoEvents', opts.disableNoEvents);
+        $calendarElement.data('eventTarget', opts.eventTarget);
+        $calendarElement.data('eventTrigger', opts.eventTrigger);
         $calendarElement.data('showDays', opts.show_days);
         $calendarElement.data('showPrevious', opts.show_previous);
         $calendarElement.data('showNext', opts.show_next);
@@ -283,7 +286,13 @@ $.fn.zabuto_calendar = function (options) {
                             if ($calendarElement.data('showToday') === true) {
                                 $dayElement.html('<span class="badge badge-today">' + currDayOfMonth + '</span>');
                             }
+                        } 
+                        
+                        if($calendarElement.data('disableNoEvents') === true) {
+                         	$dayElement.addClass('text-muted');
                         }
+                       
+                        
 
                         var $dowElement = $('<td id="' + dateId + '"></td>');
                         $dowElement.append($dayElement);
@@ -429,23 +438,33 @@ $.fn.zabuto_calendar = function (options) {
                         $dayElement.html('<span class="badge badge-event' + badgeClass + '">' + dayLabel + '</span>');
                     }
 
-                    if (typeof(value.body) !== 'undefined') {
-                        var modalUse = false;
-                        if (type === 'json' && typeof(value.modal) !== 'undefined' && value.modal === true) {
-                            modalUse = true;
-                        } else if (type === 'ajax' && 'modal' in ajaxSettings && ajaxSettings.modal === true) {
-                            modalUse = true;
+                    var isEventTrigger = (typeof($calendarElement.data('eventTrigger')) === 'string') ;
+                    if (typeof(value.body) !== 'undefined' || isEventTrigger) {
+                        var modalUse = isEventTrigger;
+                        if(modalUse == false) {
+	                        if (type === 'json' && typeof(value.modal) !== 'undefined' && value.modal === true) {
+	                            modalUse = true;
+	                        } else if (type === 'ajax' && 'modal' in ajaxSettings && ajaxSettings.modal === true) {
+	                            modalUse = true;
+	                        }
                         }
 
                         if (modalUse === true) {
                             $dowElement.addClass('event-clickable');
-
-                            var $modalElement = createModal(id, value.title, value.body, value.footer);
-                            $('body').append($modalElement);
-
-                            $('#' + id).click(function () {
-                                $('#' + id + '_modal').modal();
-                            });
+                            
+                            if(isEventTrigger) {
+                            	   $('#' + id).click(function () {
+                            		   var eventTarget = '#' +  $calendarElement.data('eventTarget');
+                            		   $(eventTarget).trigger($calendarElement.data('eventTrigger'), [$dowElement.data('date')]);
+ 	                            });
+                            } else {
+	                            var $modalElement = createModal(id, value.title, value.body, value.footer);
+	                            $('body').append($modalElement);
+	
+	                            $('#' + id).click(function () {
+	                                $('#' + id + '_modal').modal();
+	                            });
+                            }
                         }
                     }
                 });

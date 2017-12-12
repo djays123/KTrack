@@ -36,6 +36,7 @@ import ktrack.ui.panels.CommentPanel;
 import ktrack.ui.panels.DatePanel;
 import ktrack.ui.panels.DogAttributeBooleanRadioGroup;
 import ktrack.ui.panels.DogInfoPanel;
+import ktrack.ui.panels.ImagePreview;
 import ktrack.ui.panels.KennelPanel;
 import ktrack.ui.panels.LocationPanel;
 import ktrack.ui.panels.SaveButtonPanel;
