@@ -21,7 +21,10 @@ import java.util.Date;
 import java.util.LinkedList;
 
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Indexed;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -30,6 +33,9 @@ import com.querydsl.core.annotations.QueryEntity;
 @QueryEntity
 @Entity
 @Document(collection = "dogs")
+@CompoundIndexes({
+    @CompoundIndex(name = "arrivalDate_kennel", def = "{'arrivalDate' : 1, 'kennel': 1}", unique = true, dropDups=true)
+})
 public class Dog implements Serializable {
 	
 	/** Indicates an unknown dog id. */
@@ -79,10 +85,13 @@ public class Dog implements Serializable {
 	
 	private Date releaseDate;
 	
+	@Indexed
 	private String caregiver;
 	
+	@Indexed
 	private String caregiverMobile;
 	
+	@Indexed
 	private String caregiverEmail;
 	
 	

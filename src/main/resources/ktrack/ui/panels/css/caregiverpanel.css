@@ -1,0 +1,31 @@
+div.wicket-aa-container {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	background-color: #ffffff;
+	border-color: #ccc;
+	border-color: rgba(0, 0, 0, 0.2);
+	border-style: solid;
+	border-width: 1px;
+	*border-right-width: 2px;
+	*border-bottom-width: 2px;
+}
+
+div.wicket-aa ul {
+	list-style-image: none;
+	list-style-position: outside;
+	list-style-type: none;
+	margin: 0pt;
+	overflow-x: hidden;
+	padding: 0px;
+}
+
+div.wicket-aa ul li {
+   padding: 2px;
+}
+
+div.wicket-aa ul li.selected {
+	background-color: #f5f5f5;
+	cursor: pointer;
+}

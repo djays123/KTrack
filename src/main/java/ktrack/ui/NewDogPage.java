@@ -22,6 +22,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.springframework.dao.DuplicateKeyException;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
@@ -48,113 +49,111 @@ import ktrack.ui.panels.VetPanel;
 
 @MountPath("/newdog")
 public class NewDogPage extends BaseAuthenticatedPage {
-	
-	@SpringBean
-	private DogNamesRepository dogNamesRepository;
 
-	@SpringBean
-	private DogRepository dogRepository;
+    @SpringBean
+    private DogNamesRepository dogNamesRepository;
 
-	/** The dog. */
-	private transient Dog dog;
+    @SpringBean
+    private DogRepository dogRepository;
 
-	/**
-	 * 
-	 * @param pageParams
-	 */
-	public NewDogPage(final PageParameters pageParams) {
-		super(pageParams);
+    /** The dog. */
+    private transient Dog dog;
 
-		String dogId = pageParams.get(SnapshotPanel.DOG_PARAM).toString();
-		boolean isExistingDog = StringUtils.isNotEmpty(dogId);
-		if (isExistingDog) {
-			dog = dogRepository.findOne(dogId);
-		}
+    /**
+     * 
+     * @param pageParams
+     */
+    public NewDogPage(final PageParameters pageParams) {
+        super(pageParams);
 
-		if (dog == null) {
-			dog = new Dog();
-			dog.setArrivalDate(new Date());
-		}
+        String dogId = pageParams.get(SnapshotPanel.DOG_PARAM).toString();
+        boolean isExistingDog = StringUtils.isNotEmpty(dogId);
+        if (isExistingDog) {
+            dog = dogRepository.findOne(dogId);
+        }
 
-		CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
-		Form<Dog> form = new Form<Dog>("save-dog-form", dogModel);
-		DogInfoPanel dogInfoPanel = new DogInfoPanel("dogInfoPanel");
-		dogInfoPanel.setOutputMarkupId(true).setRenderBodyOnly(true);
-		form.add(dogInfoPanel);
-		
-		
-		FeedbackPanel feedback = new StatusPanel("feedback");
-	
-		AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
-			@Override
-			protected void onSubmit(AjaxRequestTarget target) {
-				dogInfoPanel.update(target);
+        if (dog == null) {
+            dog = new Dog();
+            dog.setArrivalDate(new Date());
+        }
 
-				Collection<String> imageIds = new HashSet<>();
-				IRequestParameters postParams = getRequest().getPostParameters();
-				postParams.getParameterNames().forEach(param -> {
-					if (StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
-						imageIds.add(StringUtils.substringAfter(param, ImagePreview.IMAGE_FILE_ID_PREFIX));
-					}
-				});
+        CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
+        Form<Dog> form = new Form<Dog>("save-dog-form", dogModel);
+        DogInfoPanel dogInfoPanel = new DogInfoPanel("dogInfoPanel");
+        dogInfoPanel.setOutputMarkupId(true).setRenderBodyOnly(true);
+        form.add(dogInfoPanel);
 
-				dog.setImageIds(imageIds);
-				dog.setUserId(((WebApp) getApplication()).getLoggedInUsername());
-				dogRepository.save(dog);
-				dogNamesRepository.associateImages(dog.getId(), imageIds);
-				success(getString("save-success"));
-				feedback.add(new AttributeModifier("class", "add-check"));
-				target.add(feedback);
-			}
+        FeedbackPanel feedback = new StatusPanel("feedback");
 
-			@Override
-			protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
-				super.updateAjaxAttributes(attributes);
-				attributes.setPreventDefault(true);
-			}
-		};
+        AjaxFormSubmitBehavior ajaxFormSubmitBehavior = new AjaxFormSubmitBehavior("submit") {
+            @Override
+            protected void onSubmit(AjaxRequestTarget target) {
+                dogInfoPanel.update(target);
 
-		
-		form.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
-		form.add(new CommentPanel("comment-panel").setRenderBodyOnly(true));
-		form.add(new LocationPanel("locationPanel", isExistingDog ? null : dog).setRenderBodyOnly(true));
-		form.add(new SnapshotPanel("snapshot-panel", isExistingDog ? dog : null, "upload-file-form", "image-preview", this).setRenderBodyOnly(true));
-		form.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
-		form.add(new CaregiverPanel("caregiverpanel", true).setRenderBodyOnly(true));
-		form.add(new DatePanel("datePanel"));
+                Collection<String> imageIds = new HashSet<>();
+                IRequestParameters postParams = getRequest().getPostParameters();
+                postParams.getParameterNames().forEach(param -> {
+                    if (StringUtils.startsWith(param, ImagePreview.IMAGE_FILE_ID_PREFIX)) {
+                        imageIds.add(StringUtils.substringAfter(param, ImagePreview.IMAGE_FILE_ID_PREFIX));
+                    }
+                });
 
-		form.add(ajaxFormSubmitBehavior);
-		add(form);
-		add(feedback);
+                dog.setImageIds(imageIds);
+                dog.setUserId(((WebApp) getApplication()).getLoggedInUsername());
+                try {
+                    dogRepository.save(dog);
+                    dogNamesRepository.associateImages(dog.getId(), imageIds);
+                    success(getString("save-success"));
+                    feedback.add(new AttributeModifier("class", "add-feedback-icon add-check"));
+                   
+                } catch (DuplicateKeyException duplicateKey) {
+                    error(getString("error-duplicate-record"));
+                    feedback.add(new AttributeModifier("class", "add-feedback-icon add-remove"));
+                }
+                
+                target.add(feedback);
+            }
 
+            @Override
+            protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+                super.updateAjaxAttributes(attributes);
+                attributes.setPreventDefault(true);
+            }
+        };
 
+        form.add(new VetPanel("vetpanel").setRenderBodyOnly(true));
+        form.add(new CommentPanel("comment-panel").setRenderBodyOnly(true));
+        form.add(new LocationPanel("locationPanel", isExistingDog ? null : dog).setRenderBodyOnly(true));
+        form.add(new SnapshotPanel("snapshot-panel", isExistingDog ? dog : null, "upload-file-form", "image-preview",
+                this).setRenderBodyOnly(true));
+        form.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
+        form.add(new CaregiverPanel("caregiverpanel", true, true).setRenderBodyOnly(true));
+        form.add(new DatePanel("datePanel"));
 
-		form.add(new SexPanel("sex", dogModel, "sex"));
-		form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
-		form.add(new BehaviorPanel("behavior", dogModel, "behavior"));
+        form.add(ajaxFormSubmitBehavior);
+        add(form);
+        add(feedback);
 
-		form.add(new SaveButtonPanel("savePanel", SaveText.SAVE).setRenderBodyOnly(true));
-	}
+        form.add(new SexPanel("sex", dogModel, "sex"));
+        form.add(new DogAttributeBooleanRadioGroup("sterilized", dogModel, "sterilized", Sterilized.class));
+        form.add(new BehaviorPanel("behavior", dogModel, "behavior"));
 
-	@Override
-	public void renderHead(IHeaderResponse response) {
-		super.renderHead(response);
-			response.render(new FilteredHeaderItem(CssHeaderItem.forReference(FontAwesomeCssReference.instance()),
-				"footer-container"));
-		response.render(new FilteredHeaderItem(
-				CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/NewDogPage.css")),
-				"footer-container"));
+        form.add(new SaveButtonPanel("savePanel", SaveText.SAVE).setRenderBodyOnly(true));
+    }
 
-		response.render(new FilteredHeaderItem(
-				JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(), "js/newdogpage.js")),
-				"footer-container"));
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.render(new FilteredHeaderItem(CssHeaderItem.forReference(FontAwesomeCssReference.instance()),
+                "footer-container"));
+        response.render(new FilteredHeaderItem(
+                CssHeaderItem.forReference(new CssResourceReference(getClass(), "css/NewDogPage.css")),
+                "footer-container"));
 
-	
-	}
+        response.render(new FilteredHeaderItem(
+                JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(), "js/newdogpage.js")),
+                "footer-container"));
 
-	
-	
-
-	
+    }
 
 }

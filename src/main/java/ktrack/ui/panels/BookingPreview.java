@@ -9,7 +9,6 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
-import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal.Size;
 import ktrack.entity.Dog;
 
 public class BookingPreview<T> extends Modal<T> {
@@ -21,7 +20,7 @@ public class BookingPreview<T> extends Modal<T> {
           
         CompoundPropertyModel<Dog> dogModel = new CompoundPropertyModel<Dog>(Model.of(dog));
         Form<Dog> bookingPreviewForm = new Form<Dog>("slot-booking-form", dogModel);
-        bookingPreviewForm.add(new CaregiverPanel("caregiverPanel", true).setRenderBodyOnly(true));
+        bookingPreviewForm.add(new CaregiverPanel("caregiverPanel", true, false).setRenderBodyOnly(true));
         bookingPreviewForm.add(new KennelPanel("kennelPanel").setRenderBodyOnly(true));
 
         final Model<String> bookingDate = new Model<String>("");

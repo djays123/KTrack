@@ -2,31 +2,39 @@
  * Row with equal height columns
  * --------------------------------------------------
  */
+.add-check .active:before, add-remove .active:before, .add-check .list-group-item:before,
+	.add-remove .list-group-item:before {
+	position: relative;
+	top: 1px;
+	display: inline-block;
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: 400;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: "\e013";
+}
 
-.add-check .active:before {
-    position: relative;
-    top: 1px;
-    display: inline-block;
-    font-family: 'Glyphicons Halflings';
-    font-style: normal;
-    font-weight: 400;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    content: "\e013";
+.add-check .active:before, .add-check .list-group-item:before {
+	content: "\e013";
+}
+
+.add-remove .active:before, .add-remove .list-group-item:before {
+	content: "\e014";
 }
 
 .dropzone {
-    overflow: hidden;
-    height: 100%;
-    width: 95%;
-    border:1px solid blue;
-    position:absolute;
-    z-index:10;
-    border:0px;
-    background:none;
-    padding: 7px 20px !important;
-}   
+	overflow: hidden;
+	height: 100%;
+	width: 95%;
+	border: 1px solid blue;
+	position: absolute;
+	z-index: 10;
+	border: 0px;
+	background: none;
+	padding: 7px 20px !important;
+}
 
 .dz-preview {
 	margin-top: 0px !important;

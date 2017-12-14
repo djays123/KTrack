@@ -9,16 +9,22 @@ public class StatusPanel extends FeedbackPanel {
 	public StatusPanel(String id) {
 		super(id);
 		setOutputMarkupId(true);
+		get("feedbackul").add(new AttributeModifier("class", "list-group"));
 	}
 	
 	@Override
 	protected String getCSSClass(FeedbackMessage message) {
+	    String listClass = "list-unstyled list-group-item small";
+	    
 		switch (message.getLevel()) {
 		case FeedbackMessage.SUCCESS:
-			return "active list-unstyled list-group-item  small";
+		    return listClass + " list-group-item-success";
+		case FeedbackMessage.ERROR:
+		    return listClass + " list-group-item-danger";
+			
 		}
 
-		return super.getCSSClass(message);
+		return listClass;
 	}
 
 }
