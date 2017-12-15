@@ -108,7 +108,7 @@ public class BasePage<T> extends GenericWebPage<T> {
 		navbar.setBrandImage(new PackageResourceReference(BasePage.class, "ccc.png"), Model.<String>of());
 		
 		NavbarButton<HomePage> bookSlotButton = new NavbarButton<>(BookSlot.class, Model.of(getString("book-slot")));
-	    
+			    
         navbar.addComponents(new ImmutableNavbarComponent(bookSlotButton, Navbar.ComponentPosition.RIGHT));
 
 

@@ -30,9 +30,13 @@ public abstract class BaseAuthenticatedPage extends BasePage {
 		
 		NavbarButton<HomePage> searchDogsButton = new NavbarButton<>(Search.class, Model.of(getString("search-dogs")));
 		
+		NavbarButton<HomePage> adminPageButton = new NavbarButton<>(AdminPage.class, Model.of(getString("admin-page")));
+
+		
 		navbar.addComponents(new ImmutableNavbarComponent(homeButton, Navbar.ComponentPosition.LEFT),
 				new ImmutableNavbarComponent(searchDogsButton, Navbar.ComponentPosition.LEFT),
 				new ImmutableNavbarComponent(addDogButton, Navbar.ComponentPosition.LEFT),
+				new ImmutableNavbarComponent(adminPageButton, Navbar.ComponentPosition.RIGHT),
 				new ImmutableNavbarComponent(new LogoutForm(Navbar.componentId()), Navbar.ComponentPosition.RIGHT));
 
 	};
