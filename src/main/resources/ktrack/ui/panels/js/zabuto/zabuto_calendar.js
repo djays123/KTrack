@@ -33,6 +33,8 @@ $.fn.zabuto_calendar = function (options) {
         $calendarElement.data('dowLabels', opts.dow_labels);
         $calendarElement.data('showToday', opts.today);
         $calendarElement.data('disableNoEvents', opts.disableNoEvents);
+        $calendarElement.data('dayTemplate', opts.dayTemplate);
+        $calendarElement.data('disableBeforeToday', opts.disableBeforeToday);
         $calendarElement.data('eventTarget', opts.eventTarget);
         $calendarElement.data('eventTrigger', opts.eventTrigger);
         $calendarElement.data('showDays', opts.show_days);
@@ -280,7 +282,7 @@ $.fn.zabuto_calendar = function (options) {
 
                         var $dayElement = $('<div id="' + dayId + '" class="day" >' + currDayOfMonth + '</div>');
                         $dayElement.data('day', currDayOfMonth);
-
+                        
                         if (isToday(year, month, currDayOfMonth)) {
                             $dayElement.addClass('today');
                             if ($calendarElement.data('showToday') === true) {
@@ -288,9 +290,12 @@ $.fn.zabuto_calendar = function (options) {
                             }
                         } 
                         
-                        if($calendarElement.data('disableNoEvents') === true) {
-                         	$dayElement.addClass('text-muted');
-                        }
+
+                       if ($calendarElement.data('disableNoEvents') === true
+										|| ($calendarElement.data('disableBeforeToday') === true 
+											 && isBeforeToday(year, month, currDayOfMonth))) {
+									$dayElement.addClass('text-muted');
+								}
                        
                         
 
@@ -437,6 +442,10 @@ $.fn.zabuto_calendar = function (options) {
                         var dayLabel = $dayElement.data('day');
                         $dayElement.html('<span class="badge badge-event' + badgeClass + '">' + dayLabel + '</span>');
                     }
+                    
+                    if (typeof(value.applyTemplate) !== 'undefined' && value.applyTemplate !== false) {
+                    	$dayElement.append($calendarElement.data('dayTemplate'));
+                    }
 
                     var isEventTrigger = (typeof($calendarElement.data('eventTrigger')) === 'string') ;
                     if (typeof(value.body) !== 'undefined' || isEventTrigger) {
@@ -477,6 +486,12 @@ $.fn.zabuto_calendar = function (options) {
             var todayObj = new Date();
             var dateObj = new Date(year, month, day);
             return (dateObj.toDateString() == todayObj.toDateString());
+        }
+        
+        function isBeforeToday(year, month, day) {
+            var todayObj = new Date();
+            var dateObj = new Date(year, month, day);
+            return (dateObj < todayObj);
         }
 
         function dateAsString(year, month, day) {

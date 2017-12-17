@@ -22,14 +22,14 @@ public class CalendarPanel extends Panel {
     /** The id of the div that will hold the calendar. */
     private static final String CALENDAR_DIV_ID = "slot-booking-calendar";
     
-    private final Options options;
+    private final CalendarOptions options;
 
     public CalendarPanel(String id) {
         super(id);
-        options = new Options();
+        options = new CalendarOptions();
     }
     
-    public Options getOptions() {
+    public CalendarOptions getOptions() {
         return options;
     }
     
@@ -55,12 +55,12 @@ public class CalendarPanel extends Panel {
                 "footer-container"));
 
         response.render(new FilteredHeaderItem(
-                JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getPage().getClass(),
+                JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(getClass(),
                         "js/zabuto/zabuto_calendar.js", getLocale(), getStyle(), getVariation())),
                 "footer-container"));
         response.render(new FilteredHeaderItem(
                 CssHeaderItem.forReference(
-                        new CssResourceReference(getPage().getClass(), "css/zabuto/zabuto_calendar.min.css")),
+                        new CssResourceReference(getClass(), "css/zabuto/zabuto_calendar.min.css")),
                 "footer-container"));
     }
 
