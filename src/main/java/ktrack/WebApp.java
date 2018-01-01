@@ -1,5 +1,8 @@
 package ktrack;
 
+import java.util.Collections;
+
+import org.apache.log4j.Logger;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
@@ -14,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.giffing.wicket.spring.boot.starter.app.WicketBootSecuredWebApplication;
+import com.querydsl.core.types.Predicate;
 
 import de.agilecoders.wicket.core.Bootstrap;
 import de.agilecoders.wicket.core.markup.html.RenderJavaScriptToFooterHeaderResponseDecorator;
@@ -26,12 +30,19 @@ import de.agilecoders.wicket.extensions.javascript.YuiCssCompressor;
 import de.agilecoders.wicket.less.BootstrapLess;
 import de.agilecoders.wicket.themes.markup.html.bootswatch.BootswatchTheme;
 import de.agilecoders.wicket.themes.markup.html.bootswatch.BootswatchThemeProvider;
+import ktrack.entity.Booking;
+import ktrack.entity.DailySlotBooking;
+import ktrack.repository.BookingRepository;
 import ktrack.repository.DogNamesRepository;
 import ktrack.repository.DogRepository;
 import ktrack.ui.SnapshotResource;
 
 @Component
 public class WebApp extends WicketBootSecuredWebApplication {
+	
+	/** The logger. */
+	private static final Logger LOGGER = Logger.getLogger(WebApp.class);
+	
 	/** The mount path of the snapshot resource. */
 	public static final String IMAGE_RES_REF_PATH = "/dogs/snapshot";
 	
@@ -57,6 +68,9 @@ public class WebApp extends WicketBootSecuredWebApplication {
 	
 	@Autowired
 	private DogRepository dogRepository;
+	
+	@Autowired
+	private BookingRepository bookingRepository;
 
 
 	@Override
@@ -71,7 +85,22 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		snapshotResource = new SnapshotResource(dogNamesRepository);
 		
 		mountResource(IMAGE_RES_REF_PATH, SNAPSHOT_RES_REF);
+		
+		createBookingifRequired();
 
+	}
+	
+	/**
+	 * Creates the singleton booking object.
+	 */
+	private void createBookingifRequired() {
+		Booking booking = bookingRepository.findOne((Predicate)null);
+		if(booking == null) {
+			LOGGER.info("*** Creating the singleton booking object" );
+			booking = new Booking();
+			booking.setDailySlotBookings(Collections.emptyList());
+			bookingRepository.save(booking);
+		}
 	}
 
 
