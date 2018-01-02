@@ -30,12 +30,7 @@ public class CalendarOptions extends AbstractConfig {
     
     public static final IKey<String> EventTarget = new Key<>("eventTarget", "");
     
-    public static final IKey<String> DayTemplate = new Key<>("dayTemplate", "");
-    
-    public CalendarOptions dayTemplate(String dayTemplate) {
-    	put(DayTemplate, dayTemplate);
-    	return this;
-    }
+   
     
     public CalendarOptions eventTrigger(String eventTrigger) {
     	put(EventTrigger, eventTrigger);
@@ -100,9 +95,14 @@ public class CalendarOptions extends AbstractConfig {
         
         public static final IKey<String> Title = new Key<>("title", "");
         
-        public static final IKey<Boolean>  ApplyTemplate = new Key<>("applyTemplate", false);
-        
         public static final IKey<String>  Classname = new Key<>("classname", "event");
+        
+        public static final IKey<String> DayHTML = new Key<>("dayHTML", "");
+        
+        public Event dayHTML(String dayHTML) {
+            put(DayHTML, dayHTML);
+            return this;
+        }
         
         public Event Classname(CharSequence classname) {
             put(Classname, String.valueOf(classname));
@@ -119,10 +119,6 @@ public class CalendarOptions extends AbstractConfig {
             return this;
         }
         
-        public Event applyTemplate(boolean applyTemplate) {
-            put(ApplyTemplate, applyTemplate);
-            return this;
-        }
         
         public Event modal(boolean modal) {
             put(Modal, modal);

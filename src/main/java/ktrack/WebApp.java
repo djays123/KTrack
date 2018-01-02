@@ -98,9 +98,9 @@ public class WebApp extends WicketBootSecuredWebApplication {
 		if(booking == null) {
 			LOGGER.info("*** Creating the singleton booking object" );
 			booking = new Booking();
-			booking.setDailySlotBookings(Collections.emptyList());
+			booking.setDailySlotBookings(Collections.emptySet());
 			bookingRepository.save(booking);
-		}
+		} 
 	}
 
 

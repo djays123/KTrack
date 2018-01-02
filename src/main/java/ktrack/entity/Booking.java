@@ -1,6 +1,7 @@
 package ktrack.entity;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.Set;
 
 import org.mongodb.morphia.annotations.Entity;
 import org.springframework.data.annotation.Id;
@@ -17,7 +18,7 @@ import com.querydsl.core.annotations.QueryEntity;
 @QueryEntity
 @Entity
 @Document(collection = "booking")
-public class Booking {
+public class Booking implements Serializable {
 
 	/**
 	 * The default serial version id.
@@ -26,13 +27,13 @@ public class Booking {
 	/**
 	 * The default maximum number of bookings allowed per day.
 	 */
-	private static final int MAX_BOOKINGS_PER_DAY = 40;
+	public static final int MAX_BOOKINGS_PER_DAY = 40;
 
 	/**
 	 * The default maximum number of bookings allowed to be booked in a
 	 * transaction.
 	 */
-	private static final int MAX_BOOKINGS_PER_TXN = 6;
+	public static final int MAX_BOOKINGS_PER_TXN = 6;
 
 	/** The id. */
 	@Id
@@ -54,7 +55,7 @@ public class Booking {
 	/**
 	 * The slots booked each day.
 	 */
-	private List<DailySlotBooking> dailySlotBookings;
+	private Set<DailySlotBooking> dailySlotBookings;
 
 	public String getId() {
 		return id;
@@ -80,11 +81,11 @@ public class Booking {
 		this.maximumBookingsPerTxn = maximumBookingsPerTxn;
 	}
 
-	public List<DailySlotBooking> getDailySlotBookings() {
+	public Set<DailySlotBooking> getDailySlotBookings() {
 		return dailySlotBookings;
 	}
 
-	public void setDailySlotBookings(List<DailySlotBooking> dailySlotBookings) {
+	public void setDailySlotBookings(Set<DailySlotBooking> dailySlotBookings) {
 		this.dailySlotBookings = dailySlotBookings;
 	}
 

@@ -33,7 +33,6 @@ $.fn.zabuto_calendar = function (options) {
         $calendarElement.data('dowLabels', opts.dow_labels);
         $calendarElement.data('showToday', opts.today);
         $calendarElement.data('disableNoEvents', opts.disableNoEvents);
-        $calendarElement.data('dayTemplate', opts.dayTemplate);
         $calendarElement.data('disableBeforeToday', opts.disableBeforeToday);
         $calendarElement.data('eventTarget', opts.eventTarget);
         $calendarElement.data('eventTrigger', opts.eventTrigger);
@@ -443,9 +442,13 @@ $.fn.zabuto_calendar = function (options) {
                         $dayElement.html('<span class="badge badge-event' + badgeClass + '">' + dayLabel + '</span>');
                     }
                     
-                    if (typeof(value.applyTemplate) !== 'undefined' && value.applyTemplate !== false) {
-                    	$dayElement.append($calendarElement.data('dayTemplate'));
+                    if (value.appendHTML === undefined &&  typeof(value.dayHTML) !== 'undefined' && value.dayHTML !== false) {
+                    		value.appendHTML = $('#' + value.dayHTML).detach();
                     }
+                    if(value.appendHTML !== undefined) {
+                    	    value.appendHTML.removeClass('hidden');
+                    		value.appendHTML.appendTo($dayElement);
+                    } 
 
                     var isEventTrigger = (typeof($calendarElement.data('eventTrigger')) === 'string') ;
                     if (typeof(value.body) !== 'undefined' || isEventTrigger) {

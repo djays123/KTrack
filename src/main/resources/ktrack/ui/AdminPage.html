@@ -9,6 +9,13 @@
 					wicket:id="save-admin-form">
 
 					<div wicket:id="calendar-panel">[Calendar Panel]</div>
+					<div class="input-group input-group-sm hidden" wicket:id="slots">
+						<span class="input-group-btn">
+							<div class="btn btn-primary active" style="cursor: default">
+								<span wicket:id="bookedSlots"></span>
+							</div>
+						</span> <input type="number" class="form-control" min="1" wicket:id="totalSlots">
+					</div>
 				</form>
 			</div>
 		</div>
