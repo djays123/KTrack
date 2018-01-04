@@ -49,6 +49,7 @@ public class Booking implements Serializable {
 	 */
 	private int maximumBookingsPerTxn;
 
+	
 	/** The number of days after today when the bookings will start. */
 	private int startBookingsAfterDays;
 

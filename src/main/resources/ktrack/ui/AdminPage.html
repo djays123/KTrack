@@ -9,13 +9,45 @@
 					wicket:id="save-admin-form">
 
 					<div wicket:id="calendar-panel">[Calendar Panel]</div>
-					<div class="input-group input-group-sm hidden" wicket:id="slots">
-						<span class="input-group-btn">
-							<div class="btn btn-primary active" style="cursor: default">
-								<span wicket:id="bookedSlots"></span>
-							</div>
-						</span> <input type="number" class="form-control" min="1" wicket:id="totalSlots">
+
+					<div class="hidden well-sm input-group input-group-sm col-xs-offset-2 col-xs-8" wicket:id="slots">			
+								<span class="input-group-btn">
+									<div class="btn btn-primary" style="cursor: default">
+										<span wicket:id="bookedSlots"></span>
+									</div>
+								</span> <input type="number" class="form-control" min="1"
+									wicket:id="totalSlots">
 					</div>
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<div class="row">
+
+								<div class="form-group col-xs-4 col-md-4 ">
+									<label for="maximumBookingsPerDay" class="control-label"><wicket:message
+											key="maximumBookingsPerDay">maximumBookingsPerDay</wicket:message></label>
+									<input type="number" class="form-control input-sm"
+										id="maximumBookingsPerDay" name="maximumBookingsPerDay"
+										min="0" step="1" wicket:id="maximumBookingsPerDay" />
+								</div>
+								<div class="form-group col-xs-4 col-md-4">
+									<label for="maximumBookingsPerTxn" class="control-label"><wicket:message
+											key="maximumBookingsPerTxn">maximumBookingsPerTxn</wicket:message></label>
+									<input type="number" class="form-control input-sm"
+										id="maximumBookingsPerTxn" name="maximumBookingsPerTxn"
+										wicket:id="maximumBookingsPerTxn" min="0" step="1" required />
+								</div>
+								<div class="form-group col-xs-4 col-md-4">
+									<label for="startBookingsAfterDays" class="control-label"><wicket:message
+											key="startBookingsAfterDays">startBookingsAfterDays</wicket:message></label>
+									<input type="number" class="form-control input-sm"
+										id="startBookingsAfterDays" name="startBookingsAfterDays"
+										wicket:id="startBookingsAfterDays" min="0" step="1" />
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<span wicket:id="savePanel"></span>
 				</form>
 			</div>
 		</div>

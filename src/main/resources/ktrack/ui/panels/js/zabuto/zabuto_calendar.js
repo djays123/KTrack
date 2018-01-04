@@ -446,8 +446,13 @@ $.fn.zabuto_calendar = function (options) {
                     		value.appendHTML = $('#' + value.dayHTML).detach();
                     }
                     if(value.appendHTML !== undefined) {
-                    	    value.appendHTML.removeClass('hidden');
-                    		value.appendHTML.appendTo($dayElement);
+	                    	if($dayElement.length == 0) {
+	                    		value.appendHTML.addClass('hidden');
+		                    	value.appendHTML.appendTo($calendarElement);
+	                    	} else {
+	                    	    value.appendHTML.removeClass('hidden');
+	                    		value.appendHTML.appendTo($dayElement);
+	                    	}
                     } 
 
                     var isEventTrigger = (typeof($calendarElement.data('eventTrigger')) === 'string') ;

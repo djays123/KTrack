@@ -1,5 +1,6 @@
 package ktrack.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,30 +8,35 @@ import java.util.Date;
  * @author dsharma
  *
  */
-public class DailySlotBooking {
+public class DailySlotBooking implements Serializable {
+
+    /**
+     * The default serial version id.
+     */
+    private static final long serialVersionUID = 1L;
 
 	/** The total slots available in a day. */
-	private int totalSlots;
+	private Integer totalSlots;
 	
 	/** The booked slots in a day. */
-	private int bookedSlots;
+	private Integer bookedSlots;
 	
 	/** The date represented by this record. */
 	private Date slotDate;
 
-	public int getTotalSlots() {
+	public Integer getTotalSlots() {
 		return totalSlots;
 	}
 
-	public void setTotalSlots(int totalSlots) {
+	public void setTotalSlots(Integer totalSlots) {
 		this.totalSlots = totalSlots;
 	}
 
-	public int getBookedSlots() {
+	public Integer getBookedSlots() {
 		return bookedSlots;
 	}
 
-	public void setBookedSlots(int bookedSlots) {
+	public void setBookedSlots(Integer bookedSlots) {
 		this.bookedSlots = bookedSlots;
 	}
 

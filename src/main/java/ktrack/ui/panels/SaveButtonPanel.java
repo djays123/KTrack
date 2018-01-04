@@ -12,7 +12,7 @@ import org.apache.wicket.model.Model;
  */
 public class SaveButtonPanel extends Panel {
 	/**
-	 * The possible texts for the save butoon rendered in the form
+	 * The possible texts for the save button rendered in the form
 	 * 
 	 */
 	public enum SaveText {
