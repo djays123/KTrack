@@ -62,8 +62,11 @@ $.fn.zabuto_calendar = function (options) {
             var $legendObj = drawLegend($calendarElement);
 
             var $containerHtml = $('<div class="zabuto_calendar"></div>');
+            var $hiddenHtml = $('<div class="hidden"></div>');
+            $hiddenHtml.attr('id',$calendarElement.attr('id') + '_hiddendata');
             $containerHtml.append($tableObj);
             $containerHtml.append($legendObj);
+            $containerHtml.append($hiddenHtml);
 
             $calendarElement.append($containerHtml);
 
@@ -415,6 +418,8 @@ $.fn.zabuto_calendar = function (options) {
         function drawEvents($calendarElement, type) {
             var jsonData = $calendarElement.data('jsonData');
             var ajaxSettings = $calendarElement.data('ajaxSettings');
+            var $hiddenHtml = $('#' + $calendarElement.attr('id') + '_hiddendata');
+            $hiddenHtml.empty();
 
             var events = $calendarElement.data('events');
             if (events !== false) {
@@ -444,13 +449,12 @@ $.fn.zabuto_calendar = function (options) {
                     
                     if (value.appendHTML === undefined &&  typeof(value.dayHTML) !== 'undefined' && value.dayHTML !== false) {
                     		value.appendHTML = $('#' + value.dayHTML).detach();
+                    		value.appendHTML.removeClass('hidden');
                     }
                     if(value.appendHTML !== undefined) {
 	                    	if($dayElement.length == 0) {
-	                    		value.appendHTML.addClass('hidden');
-		                    	value.appendHTML.appendTo($calendarElement);
+		                    	value.appendHTML.appendTo($hiddenHtml);
 	                    	} else {
-	                    	    value.appendHTML.removeClass('hidden');
 	                    		value.appendHTML.appendTo($dayElement);
 	                    	}
                     } 
